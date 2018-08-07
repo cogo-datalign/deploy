@@ -1,0 +1,35 @@
+#!/bin/sh
+
+# Wait for the tag to build in docker.cogolo.net
+until curl --output /dev/null --silent --head --fail https://docker.cogolo.net/api/v1/repository/$DOCKER_ORG/$DOCKER_REPO/tag/$TRAVIS_TAG/images?access_token=$DOCKER_ACCESS_TOKEN; do
+  echo "Waiting for tag $TRAVIS_TAG to build in docker.cogolo.net..."
+  sleep 5
+done
+ 
+# Download the stable version of Kubectl
+curl -LO https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl
+chmod +x ./kubectl
+sudo mv ./kubectl /usr/local/bin/kubectl
+
+# Create the Kube config and set the token 
+mkdir ${HOME}/.kube
+curl https://git.cogolo.net/kubes/deploy/blob/master/config >> ${HOME}/.kube/config
+kubectl config set users.default.token "$KUBE_TOKEN"
+kubectl config set clusters.cluster.server "$KUBE_SERVER"
+kubectl config set clusters.cluster.certificate-authority-data "$KUBE_CA"
+
+# Here KUBE_DEPLOYMENTS can be one or many, e.g.
+# deployment/senderd,deployment/ratesd or just cronjob/test
+IFS=',' read -r -a array <<< "$KUBE_DEPLOYMENTS"
+
+# Deploy to each namespace
+for element in "${array[@]}"
+do
+  kubectl set image $element -n $KUBE_NAMESPACE deployment=docker.cogolo.net/$DOCKER_ORG/$DOCKER_REPO:$TRAVIS_TAG
+done
+
+# Ensure successful rollout
+for element in "${array[@]}"
+do
+  kubectl rollout status -n $KUBE_NAMESPACE $element
+done
