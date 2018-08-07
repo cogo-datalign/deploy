@@ -7,12 +7,12 @@ clusters:
 contexts:
 - context:
     cluster: cluster
-    user:
+    user: default
   name: cluster
 current-context:
 kind: Config
 preferences: {}
 users:
-- name:
+- name: default
   user:
     token:
