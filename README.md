@@ -2,8 +2,11 @@
 
 Deployment automation for Kubernetes in TravisCI
 
-To get automated deployments working first follow the Travis Configuration guide, then
-follow the steps to trigger a deployment.
+To get automated deployments:
+
+1. Setup the docker.cogolo.net repository to trigger on `tags/.+` builds
+1. Follow the Travis Configuration guide, then
+1. follow the steps to trigger a deployment.
 
 ## Travis Configuration
 
@@ -23,7 +26,6 @@ automated tagged deployments to work.
 | KUBE_CA | Optional, if the server IP requires a CA |
 | $KUBE_DEPLOYMENTS | Comma seperated list of deployments, e.g. deployment/senderd |
 | KUBE_NAMESPACE | Namespace where the deployments are currently running |
-
 
 ### Travis YAML
 
