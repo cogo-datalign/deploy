@@ -13,7 +13,7 @@ sudo mv ./kubectl /usr/local/bin/kubectl
 
 # Create the Kube config and set the token 
 mkdir ${HOME}/.kube
-curl https://git.cogolo.net/kubes/deploy/blob/master/config >> ${HOME}/.kube/config
+curl https://raw.git.cogolo.net/kubes/deploy/master/config >> ${HOME}/.kube/config
 kubectl config set users.default.token "$KUBE_TOKEN"
 kubectl config set clusters.cluster.server "$KUBE_SERVER"
 kubectl config set clusters.cluster.certificate-authority-data "$KUBE_CA"
