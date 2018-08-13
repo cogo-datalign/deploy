@@ -2,6 +2,8 @@
 
 # Wait for the tag to build in docker.cogolo.net
 for i in $(seq 1 100); do
+  echo "Youre trying to access"
+  echo "https://docker.cogolo.net/api/v1/repository/$DOCKER_ORG/$DOCKER_REPO/tag/$TRAVIS_TAG/images?access_token=$DOCKER_ACCESS_TOKEN"
   curl --output /dev/null --silent --head --fail https://docker.cogolo.net/api/v1/repository/$DOCKER_ORG/$DOCKER_REPO/tag/$TRAVIS_TAG/images?access_token=$DOCKER_ACCESS_TOKEN && {
     DONE="true"
     break
