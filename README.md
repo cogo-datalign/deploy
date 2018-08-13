@@ -31,13 +31,12 @@ automated tagged deployments to work.
 
 Just add:
 
-```bash
-deploy:
-  provider: script
-  script: source <(curl -s https://raw.git.cogolo.net/kubes/deploy/master/deploy.sh)
-  skip_cleanup: true
-  on:
-    tags: true
+```yml
+after_success:
+  - >
+    if [ -n "$TRAVIS_TAG" ]; then
+      bash <(curl -s https://raw.git.cogolo.net/kubes/deploy/not_sh/deploy.sh)
+    fi
 ```
 
 To your `travis.yml` file.
