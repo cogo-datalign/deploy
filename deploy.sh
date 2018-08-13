@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/usr/bin/env bash
 
 # Wait for the tag to build in docker.cogolo.net
 until curl --output /dev/null --silent --head --fail https://docker.cogolo.net/api/v1/repository/$DOCKER_ORG/$DOCKER_REPO/tag/$TRAVIS_TAG/images?access_token=$DOCKER_ACCESS_TOKEN; do
