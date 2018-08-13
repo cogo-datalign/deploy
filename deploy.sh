@@ -2,7 +2,7 @@
 
 # Wait for the tag to build in docker.cogolo.net
 for i in $(seq 1 60); do
-  https://docker.cogolo.net/api/v1/repository/$DOCKER_ORG/$DOCKER_REPO/tag/$TRAVIS_TAG/images -H "Authorization Bearer $OAUTH_TOKEN" && {
+  curl --output /dev/null --silent --head --fail https://docker.cogolo.net/api/v1/repository/$DOCKER_ORG/$DOCKER_REPO/tag/$TRAVIS_TAG/images -H "Authorization Bearer $OAUTH_TOKEN" && {
     DONE="true"
     break
   } || {
