@@ -1,10 +1,21 @@
 #!/usr/bin/env bash
 
 # Wait for the tag to build in docker.cogolo.net
-until curl --output /dev/null --silent --head --fail https://docker.cogolo.net/api/v1/repository/$DOCKER_ORG/$DOCKER_REPO/tag/$TRAVIS_TAG/images?access_token=$DOCKER_ACCESS_TOKEN; do
-  echo "Waiting for tag $TRAVIS_TAG to build in docker.cogolo.net..."
-  sleep 5
+for i in $(seq 1 100); do
+  curl --output /dev/null --silent --head --fail https://docker.cogolo.net/api/v1/repository/$DOCKER_ORG/$DOCKER_REPO/tag/$TRAVIS_TAG/images?access_token=$DOCKER_ACCESS_TOKEN && {
+    DONE="true"
+    break
+  } || {
+    echo "Waiting for tag $TRAVIS_TAG to build in docker.cogolo.net..."
+    sleep 5
+  }
 done
+
+if [ -z "$DONE" ]; then
+  echo "Timeout waiting on $TRAVIS_TAG to build in docker.cogolo.net."
+  echo "Exiting."
+  exit 1
+fi
  
 # Download the stable version of Kubectl
 curl -LO https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl
