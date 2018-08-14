@@ -29,7 +29,7 @@ kubectl config set users.default.token "$KUBE_TOKEN"
 kubectl config set clusters.cluster.server "$KUBE_SERVER"
 kubectl config set clusters.cluster.certificate-authority-data "$KUBE_CA"
 
-kubectl config set-context $(kubectl config current-context) --namespace=$KUBE_NAMESPACE
+kubectl config set-context cluster --namespace=$KUBE_NAMESPACE
 
 # Here KUBE_DEPLOYMENTS can be one or many, e.g.
 # deployment/senderd,deployment/ratesd or just cronjob/test
