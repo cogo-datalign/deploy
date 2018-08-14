@@ -22,9 +22,11 @@ curl -LO --silent https://storage.googleapis.com/kubernetes-release/release/$(cu
 chmod +x ./kubectl
 sudo mv ./kubectl /usr/local/bin/kubectl
 
+KUBE_CONFIG="$HOME/.kube/config"
+
 # Create the Kube config and set the token 
-mkdir ${HOME}/.kube
-curl --silent https://raw.git.cogolo.net/kubes/deploy/master/config >> ${HOME}/.kube/config
+mkdir -p ${HOME}/.kube
+curl --silent https://raw.git.cogolo.net/kubes/deploy/master/config >> $KUBE_CONFIG
 kubectl config set users.default.token "$KUBE_TOKEN"
 kubectl config set clusters.cluster.server "$KUBE_SERVER"
 
@@ -32,18 +34,26 @@ if [ -n "$KUBE_CA" ]; then
   kubectl config set clusters.cluster.certificate-authority-data "$KUBE_CA"
 fi
 
+# manually set the current context; "kubectl config set-context cluster" doesn't work
+sed -i '' 's/current-context: ""/current-context: cluster/g' $KUBE_CONFIG
+
+# REMOVE
+echo
+cat $KUBE_CONFIG
+echo
+
 # Here KUBE_DEPLOYMENTS can be one or many, e.g.
 # deployment/senderd,deployment/ratesd or just cronjob/test
 IFS=',' read -r -a array <<< "$KUBE_DEPLOYMENTS"
+IFS=',' read -r -a containers <<< "$KUBE_CONTAINERS"
 
-echo
-cat .kube/config
-echo
-
-# Deploy to each namespace
+# Deploy each container to each namespace
 for element in "${array[@]}"
 do
-  kubectl set image $element -n $KUBE_NAMESPACE deployment=docker.cogolo.net/$DOCKER_ORG/$DOCKER_REPO:$TRAVIS_TAG
+  for container in "${containers[@]}"
+  do
+    kubectl set image $element -n $KUBE_NAMESPACE $container=docker.cogolo.net/$DOCKER_ORG/$DOCKER_REPO:$TRAVIS_TAG
+  done
 done
 
 # Ensure successful rollout
