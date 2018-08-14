@@ -27,15 +27,17 @@ mkdir ${HOME}/.kube
 curl https://raw.git.cogolo.net/kubes/deploy/master/config >> ${HOME}/.kube/config
 kubectl config set users.default.token "$KUBE_TOKEN"
 kubectl config set clusters.cluster.server "$KUBE_SERVER"
+kubectl config set clusters.cluster.name "$KUBE_CLUSTER"
 kubectl config set clusters.cluster.certificate-authority-data "$KUBE_CA"
 
 kubectl config get-contexts
-kubectl config set-context cluster --namespace=dmetal
+kubectl config set-context $KUBE_CLUSTER --namespace=$KUBE_CLUSTER
 
 # Here KUBE_DEPLOYMENTS can be one or many, e.g.
 # deployment/senderd,deployment/ratesd or just cronjob/test
 IFS=',' read -r -a array <<< "$KUBE_DEPLOYMENTS"
 
+echo
 cat ~/.kube/config
 
 # Deploy to each namespace

@@ -38,7 +38,7 @@ Add the following to your `travis.yml` file:
 after_success:
   - >
     if [ -n "$TRAVIS_TAG" ]; then
-      bash <(curl -s https://raw.git.cogolo.net/kubes/deploy/not_sh/deploy.sh)
+      bash <(curl -s https://raw.git.cogolo.net/kubes/deploy/master/deploy.sh)
     fi
 ```
 
