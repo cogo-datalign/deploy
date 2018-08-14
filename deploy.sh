@@ -35,7 +35,7 @@ if [ -n "$KUBE_CA" ]; then
 fi
 
 # manually set the current context; "kubectl config set-context cluster" doesn't work
-sed -i '' 's/current-context: ""/current-context: cluster/g' $KUBE_CONFIG
+sed -i 's/current-context: ""/current-context: cluster/g' $KUBE_CONFIG
 
 # REMOVE
 echo
