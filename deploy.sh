@@ -32,20 +32,9 @@ if [ -n "$KUBE_CA" ]; then
   kubectl config set clusters.cluster.certificate-authority-data "$KUBE_CA"
 fi
 
-echo
-kubectl config get-contexts
-echo
-kubectl config set-context cluster --namespace=$KUBE_NAMESPACE
-echo
-kubectl config get-contexts
-
 # Here KUBE_DEPLOYMENTS can be one or many, e.g.
 # deployment/senderd,deployment/ratesd or just cronjob/test
 IFS=',' read -r -a array <<< "$KUBE_DEPLOYMENTS"
-
-echo
-cat ~/.kube/config
-echo
 
 # Deploy to each namespace
 for element in "${array[@]}"

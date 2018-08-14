@@ -26,7 +26,8 @@ automated tagged deployments to work.
 | KUBE_CA | Optional, if the server IP requires a CA | No |
 | $KUBE_DEPLOYMENTS | Comma seperated list of deployments, e.g. deployment/senderd | No |
 | KUBE_NAMESPACE | Namespace where the deployments are currently running | No |
-| OAUTH_TOKEN | (Only required if Quay repo is private) Access token allows us to use the Quay API (see instructions below) | Yes |
+| KUBE_SECRET | Optional, only required if Quay repo is private. The name of the kubes secret that willa llow the deployment to pull the docker image. | No |
+| OAUTH_TOKEN | Optional, only required if Quay repo is private. Access token allows us to use the Quay API (see instructions below) | Yes |
 
 If the `Encrypted` is `Yes`, store these environment variables in Travis using `travis encrypt` ([instructions here](https://git.cogolo.net/platform/wiki/wiki/Travis#usage)).
 
