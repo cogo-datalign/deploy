@@ -36,6 +36,10 @@ fi
 # deployment/senderd,deployment/ratesd or just cronjob/test
 IFS=',' read -r -a array <<< "$KUBE_DEPLOYMENTS"
 
+echo
+cat .kube/config
+echo
+
 # Deploy to each namespace
 for element in "${array[@]}"
 do
