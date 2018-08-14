@@ -27,8 +27,8 @@ KUBE_CONFIG="$HOME/.kube/config"
 # Create the Kube config and set the token 
 mkdir -p ${HOME}/.kube
 curl --silent https://raw.git.cogolo.net/kubes/deploy/master/config >> $KUBE_CONFIG
-kubectl config set users.default.token "$KUBE_TOKEN"
-kubectl config set clusters.cluster.server "$KUBE_SERVER"
+kubectl config set users.default.token "$KUBE_TOKEN" > /dev/null
+kubectl config set clusters.cluster.server "$KUBE_SERVER" > /dev/null
 
 if [ -n "$KUBE_CA" ]; then
   kubectl config set clusters.cluster.certificate-authority-data "$KUBE_CA"
@@ -36,11 +36,6 @@ fi
 
 # manually set the current context; "kubectl config set-context cluster" doesn't work
 sed -i 's/current-context: ""/current-context: cluster/g' $KUBE_CONFIG
-
-# REMOVE
-echo
-cat $KUBE_CONFIG
-echo
 
 # Here KUBE_DEPLOYMENTS can be one or many, e.g.
 # deployment/senderd,deployment/ratesd or just cronjob/test
