@@ -15,21 +15,24 @@ automated tagged deployments to work.
 
 ### Environment Variables
 
-| Environment Variable  | Purpose |
-| ------------- | ------------- |
-| $DOCKER_ORG  | Organization associated with this repositories docker repo |
-| $DOCKER_REPO  | Name of this repositories docker repo  |
-| $TRAVIS_TAG | Name of the tag building in travis (e.g. v0.10) |
-| $DOCKER_ACCESS_TOKEN | docker.cogolo.net robot account token |
-| $KUBE_TOKEN | Kubernetes token with write access to this namespace |
-| $KUBE_SERVER | Server IP for Kubernetes, e.g. https://sink.cogolo.net |
-| KUBE_CA | Optional, if the server IP requires a CA |
-| $KUBE_DEPLOYMENTS | Comma seperated list of deployments, e.g. deployment/senderd |
-| KUBE_NAMESPACE | Namespace where the deployments are currently running |
+| Environment Variable  | Purpose | Encrypted |
+| ------------- | ------------- | -------------- |
+| $DOCKER_ORG  | Organization associated with this repositories docker repo | No |
+| $DOCKER_REPO  | Name of this repositories docker repo  | No |
+| $TRAVIS_TAG | Name of the tag building in travis (e.g. v0.10) | No |
+| $DOCKER_ACCESS_TOKEN | docker.cogolo.net robot account token | Yes |
+| $KUBE_TOKEN | Kubernetes token with write access to this namespace | Yes |
+| $KUBE_SERVER | Server IP for Kubernetes, e.g. https://sink.cogolo.net | No |
+| KUBE_CA | Optional, if the server IP requires a CA | No |
+| $KUBE_DEPLOYMENTS | Comma seperated list of deployments, e.g. deployment/senderd | No |
+| KUBE_NAMESPACE | Namespace where the deployments are currently running | No |
+| OAUTH_TOKEN | (Only required if Quay repo is private) Access token allows us to use the Quay API (see instructions below) | Yes |
+
+If the `Encrypted` is `Yes`, store these environment variables in Travis using `travis encrypt` ([instructions here](https://git.cogolo.net/platform/wiki/wiki/Travis#usage)).
 
 ### Travis YAML
 
-Just add:
+Add the following to your `travis.yml` file:
 
 ```yml
 after_success:
@@ -39,7 +42,13 @@ after_success:
     fi
 ```
 
-To your `travis.yml` file.
+If your Quay repo is private, generate an OAuth token for that repository. To do so:
+
+- Create a new `Application` for that repo
+  - This is different than creating a repo, go to https://docker.cogolo.net/organization/<your_org>?tab=applications and create a new one
+- Click the `Generate Token` button from the vertical list on the left
+- Generate a new oauth token
+- Encrypt the token and add it to yoour `travis.yml`
 
 ## Triggering a deployment
 
