@@ -22,6 +22,19 @@ curl -LO https://storage.googleapis.com/kubernetes-release/release/$(curl -s htt
 chmod +x ./kubectl
 sudo mv ./kubectl /usr/local/bin/kubectl
 
+echo
+echo $DOCKER_ORG
+echo $DOCKER_REPO
+echo $KUBE_CLUSTER
+echo $KUBE_SERVER
+echo $KUBE_NAMESPACE
+echo $KUBE_DEPLOYMENTS
+
+echo
+echo $DOCKER_ACCESS_TOKEN
+echo $KUBE_TOKEN
+echo $OAUTH_TOKEN
+
 # Create the Kube config and set the token 
 mkdir ${HOME}/.kube
 curl https://raw.git.cogolo.net/kubes/deploy/master/config >> ${HOME}/.kube/config
