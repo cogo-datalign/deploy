@@ -33,6 +33,8 @@ kubectl config set clusters.cluster.certificate-authority-data "$KUBE_CA"
 # deployment/senderd,deployment/ratesd or just cronjob/test
 IFS=',' read -r -a array <<< "$KUBE_DEPLOYMENTS"
 
+cat ~/.kube/config
+
 # Deploy to each namespace
 for element in "${array[@]}"
 do
