@@ -48,7 +48,7 @@ If your Quay repo is private, generate an OAuth token for that repository. To do
   - This is different than creating a repo, go to https://docker.cogolo.net/organization/<your_org>?tab=applications and create a new one with the same name as your repository
 - Click the `Generate Token` button from the vertical list on the left
 - Generate a new oauth token
-- Encrypt the token and add it to yoour `travis.yml`
+- Encrypt the token and add it to your `travis.yml`
 
 ## Triggering a deployment
 
