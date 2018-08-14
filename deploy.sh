@@ -18,33 +18,24 @@ if [ -z "$DONE" ]; then
 fi
  
 # Download the stable version of Kubectl
-curl -LO https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl
+curl -LO --silent https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl
 chmod +x ./kubectl
 sudo mv ./kubectl /usr/local/bin/kubectl
 
-echo
-echo $DOCKER_ORG
-echo $DOCKER_REPO
-echo $KUBE_CLUSTER
-echo $KUBE_SERVER
-echo $KUBE_NAMESPACE
-echo $KUBE_DEPLOYMENTS
-
-echo
-echo $DOCKER_ACCESS_TOKEN
-echo $KUBE_TOKEN
-echo $OAUTH_TOKEN
-
 # Create the Kube config and set the token 
 mkdir ${HOME}/.kube
-curl https://raw.git.cogolo.net/kubes/deploy/master/config >> ${HOME}/.kube/config
+curl --silent https://raw.git.cogolo.net/kubes/deploy/master/config >> ${HOME}/.kube/config
 kubectl config set users.default.token "$KUBE_TOKEN"
 kubectl config set clusters.cluster.server "$KUBE_SERVER"
-kubectl config set clusters.cluster.name "$KUBE_CLUSTER"
-kubectl config set clusters.cluster.certificate-authority-data "$KUBE_CA"
 
+if [ -n "$KUBE_CA" ]; then
+  kubectl config set clusters.cluster.certificate-authority-data "$KUBE_CA"
+fi
+
+echo
 kubectl config get-contexts
-kubectl config set-context $KUBE_CLUSTER --namespace=$KUBE_CLUSTER
+echo
+kubectl config set-context cluster --namespace=$KUBE_NAMESPACE
 
 # Here KUBE_DEPLOYMENTS can be one or many, e.g.
 # deployment/senderd,deployment/ratesd or just cronjob/test
@@ -52,6 +43,7 @@ IFS=',' read -r -a array <<< "$KUBE_DEPLOYMENTS"
 
 echo
 cat ~/.kube/config
+echo
 
 # Deploy to each namespace
 for element in "${array[@]}"
