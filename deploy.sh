@@ -36,6 +36,8 @@ echo
 kubectl config get-contexts
 echo
 kubectl config set-context cluster --namespace=$KUBE_NAMESPACE
+echo
+kubectl config get-contexts
 
 # Here KUBE_DEPLOYMENTS can be one or many, e.g.
 # deployment/senderd,deployment/ratesd or just cronjob/test
