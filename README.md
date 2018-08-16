@@ -38,10 +38,7 @@ Add the following to your `travis.yml` file:
 
 ```yml
 after_success:
-  - >
-    if [ -n "$TRAVIS_TAG" ]; then
-      bash <(curl -s https://raw.git.cogolo.net/kubes/deploy/master/deploy.sh)
-    fi
+  - bash <(curl -s https://raw.git.cogolo.net/kubes/deploy/master/deploy.sh)
 ```
 
 If your Quay repo is private, generate an OAuth token for that repository. To do so:
