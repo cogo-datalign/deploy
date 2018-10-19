@@ -47,22 +47,19 @@ if [[ $TRAVIS_TAG == *"canary"* || $TRAVIS_TAG == *"multi"* ]]; then
   # manually set the current context; "kubectl config set-context cluster" doesn't work
   sed -i 's/current-context: ""/current-context: cluster/g' $KUBE_CONFIG
 
-  IFS=',' read -r -a array <<< "$KUBE_DEPLOYMENTS_CANARY"
-  IFS=',' read -r -a containers <<< "$KUBE_CONTAINERS_CANARY"
+  IFS=',' read -r -a DEPLOYMENTS <<< "$KUBE_DEPLOYMENTS_CANARY"
+  IFS=',' read -r -a CONTAINERS <<< "$KUBE_CONTAINERS_CANARY"
 
   # Deploy each container to each namespace
-  for element in "${array[@]}"
-  do
-    for container in "${containers[@]}"
-    do
-      kubectl set image $element -n $KUBE_NAMESPACE $container=docker.cogolo.net/$DOCKER_ORG/$DOCKER_REPO:$TRAVIS_TAG
+  for deployment in "${DEPLOYMENTS[@]}"; do
+    for container in "${CONTAINERS[@]}"; do
+      kubectl set image $deployment -n $KUBE_NAMESPACE $container=docker.cogolo.net/$DOCKER_ORG/$DOCKER_REPO:$TRAVIS_TAG
     done
   done
 
   # Ensure successful rollout
-  for element in "${array[@]}"
-  do
-    kubectl rollout status -n $KUBE_NAMESPACE $element
+  for deployment in "${DEPLOYMENTS[@]}"; do
+    kubectl rollout status -n $KUBE_NAMESPACE $deployment
   done
 
   if [[ $TRAVIS_TAG == *"canary"*]]; then
@@ -82,20 +79,17 @@ sed -i 's/current-context: ""/current-context: cluster/g' $KUBE_CONFIG
 
 # Here KUBE_DEPLOYMENTS can be one or many, e.g.
 # deployment/senderd,deployment/ratesd or just cronjob/test
-IFS=',' read -r -a array <<< "$KUBE_DEPLOYMENTS"
-IFS=',' read -r -a containers <<< "$KUBE_CONTAINERS"
+IFS=',' read -r -a DEPLOYMENTS <<< "$KUBE_DEPLOYMENTS"
+IFS=',' read -r -a CONTAINERS <<< "$KUBE_CONTAINERS"
 
 # Deploy each container to each namespace
-for element in "${array[@]}"
-do
-  for container in "${containers[@]}"
-  do
-    kubectl set image $element -n $KUBE_NAMESPACE $container=docker.cogolo.net/$DOCKER_ORG/$DOCKER_REPO:$TRAVIS_TAG
+for deployment in "${DEPLOYMENTS[@]}"; do
+  for container in "${CONTAINERS[@]}"; do
+    kubectl set image $deployment -n $KUBE_NAMESPACE $container=docker.cogolo.net/$DOCKER_ORG/$DOCKER_REPO:$TRAVIS_TAG
   done
 done
 
 # Ensure successful rollout
-for element in "${array[@]}"
-do
-  kubectl rollout status -n $KUBE_NAMESPACE $element
+for deployment in "${DEPLOYMENTS[@]}"; do
+  kubectl rollout status -n $KUBE_NAMESPACE $deployment
 done
