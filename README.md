@@ -26,11 +26,24 @@ automated tagged deployments to work.
 | KUBE_CA | Optional, if the server IP requires a CA | No |
 | $KUBE_DEPLOYMENTS | Comma seperated list of deployments, e.g. deployment/senderd | No |
 | $KUBE_CONTAINERS | Comma seperated list of containers to deploy | No |
+| $KUBE_TOKEN_CANARY | Optional, Kubernetes token with write access to this namespace | Yes |
+| $KUBE_SERVER_CARNARY | Optional, server IP for Kubernetes, e.g. https://sink.cogolo.net | No |
+| KUBE_CA_CANARY | Optional, if the server IP requires a CA | No |
+| $KUBE_DEPLOYMENTS_CANARY | Optional, comma seperated list of deployments, e.g. deployment/senderd | No |
+| $KUBE_CONTAINERS_CANARY | Optional, comma seperated list of containers to deploy | No |
 | $KUBE_NAMESPACE | Namespace where the deployments are currently running | No |
 | $KUBE_SECRET | Optional, only required if Quay repo is private. The name of the kubes secret that willa llow the deployment to pull the docker image. | No |
 | $OAUTH_TOKEN | Optional, only required if Quay repo is private. Access token allows us to use the Quay API (see instructions below) | Yes |
 
 If the `Encrypted` is `Yes`, store these environment variables in Travis using `travis encrypt` ([instructions here](https://git.cogolo.net/platform/wiki/wiki/Travis#usage)).
+
+### Canary/Multi deployments
+
+Canary and multi deployments allow you to target a second point of deployment. To do this tag the branch with the prefixes
+`canary-` or `multi-`.
+
+A canary deployment will only deploy to the canary specified server/deployment/containers and a multi will taget
+both environments.
 
 ### Travis YAML
 

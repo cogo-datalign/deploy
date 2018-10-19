@@ -33,6 +33,43 @@ KUBE_CONFIG="$HOME/.kube/config"
 # Create the Kube config and set the token 
 mkdir -p ${HOME}/.kube
 curl --silent https://raw.git.cogolo.net/kubes/deploy/master/config >> $KUBE_CONFIG
+
+# Ability to do canary OR multi deployments
+if [[ $TRAVIS_TAG == *"canary"* || $TRAVIS_TAG == *"multi"* ]]; then
+  kubectl config set users.default.token "$KUBE_TOKEN_CANARY"
+  kubectl config set clusters.cluster.server "$KUBE_SERVER_CANARY"
+  kubectl config set clusters.cluster.certificate-authority-data "$KUBE_CA_CANARY"
+
+  if [ -n "$KUBE_CA_CANARY" ]; then
+    kubectl config set clusters.cluster.certificate-authority-data "$KUBE_CA_CANARY"
+  fi
+
+  # manually set the current context; "kubectl config set-context cluster" doesn't work
+  sed -i 's/current-context: ""/current-context: cluster/g' $KUBE_CONFIG
+
+  IFS=',' read -r -a array <<< "$KUBE_DEPLOYMENTS_CANARY"
+  IFS=',' read -r -a containers <<< "$KUBE_CONTAINERS_CANARY"
+
+  # Deploy each container to each namespace
+  for element in "${array[@]}"
+  do
+    for container in "${containers[@]}"
+    do
+      kubectl set image $element -n $KUBE_NAMESPACE $container=docker.cogolo.net/$DOCKER_ORG/$DOCKER_REPO:$TRAVIS_TAG
+    done
+  done
+
+  # Ensure successful rollout
+  for element in "${array[@]}"
+  do
+    kubectl rollout status -n $KUBE_NAMESPACE $element
+  done
+
+  if [[ $TRAVIS_TAG == *"canary"*]]; then
+    exit 0
+  fi
+fi
+
 kubectl config set users.default.token "$KUBE_TOKEN" > /dev/null
 kubectl config set clusters.cluster.server "$KUBE_SERVER" > /dev/null
 
