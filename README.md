@@ -17,23 +17,23 @@ automated tagged deployments to work.
 
 | Environment Variable  | Purpose | Encrypted |
 | ------------- | ------------- | -------------- |
-| $DOCKER_ORG  | Organization associated with this repositories docker repo | No |
-| $DOCKER_REPO  | Name of this repositories docker repo  | No |
-| $TRAVIS_TAG | Name of the tag building in travis (e.g. v0.10) | No |
-| $DOCKER_ACCESS_TOKEN | docker.cogolo.net robot account token | Yes |
-| $KUBE_TOKEN | Kubernetes token with write access to this namespace | Yes |
-| $KUBE_SERVER | Server IP for Kubernetes, e.g. https://sink.cogolo.net | No |
+| DOCKER_ORG  | Organization associated with this repositories docker repo | No |
+| DOCKER_REPO  | Name of this repositories docker repo  | No |
+| TRAVIS_TAG | Name of the tag building in travis (e.g. v0.10) | No |
+| DOCKER_ACCESS_TOKEN | docker.cogolo.net robot account token | Yes |
+| KUBE_TOKEN | Kubernetes token with write access to this namespace | Yes |
+| KUBE_SERVER | Server IP for Kubernetes, e.g. https://sink.cogolo.net | No |
 | KUBE_CA | Optional, if the server IP requires a CA | No |
-| $KUBE_DEPLOYMENTS | Comma seperated list of deployments, e.g. deployment/senderd | No |
-| $KUBE_CONTAINERS | Comma seperated list of containers to deploy | No |
-| $KUBE_TOKEN_CANARY | Optional, Kubernetes token with write access to this namespace | Yes |
-| $KUBE_SERVER_CARNARY | Optional, server IP for Kubernetes, e.g. https://sink.cogolo.net | No |
+| KUBE_DEPLOYMENTS | Comma seperated list of deployments, e.g. deployment/senderd | No |
+| KUBE_CONTAINERS | Comma seperated list of containers to deploy | No |
+| KUBE_TOKEN_CANARY | Optional, Kubernetes token with write access to this namespace | Yes |
+| KUBE_SERVER_CARNARY | Optional, server IP for Kubernetes, e.g. https://sink.cogolo.net | No |
 | KUBE_CA_CANARY | Optional, if the server IP requires a CA | No |
-| $KUBE_DEPLOYMENTS_CANARY | Optional, comma seperated list of deployments, e.g. deployment/senderd | No |
-| $KUBE_CONTAINERS_CANARY | Optional, comma seperated list of containers to deploy | No |
-| $KUBE_NAMESPACE | Namespace where the deployments are currently running | No |
-| $KUBE_SECRET | Optional, only required if Quay repo is private. The name of the kubes secret that willa llow the deployment to pull the docker image. | No |
-| $OAUTH_TOKEN | Optional, only required if Quay repo is private. Access token allows us to use the Quay API (see instructions below) | Yes |
+| KUBE_DEPLOYMENTS_CANARY | Optional, comma seperated list of deployments, e.g. deployment/senderd | No |
+| KUBE_CONTAINERS_CANARY | Optional, comma seperated list of containers to deploy | No |
+| KUBE_NAMESPACE | Namespace where the deployments are currently running | No |
+| KUBE_SECRET | Optional, only required if Quay repo is private. The name of the kubes secret that willa llow the deployment to pull the docker image. | No |
+| OAUTH_TOKEN | Optional, only required if Quay repo is private. Access token allows us to use the Quay API (see instructions below) | Yes |
 
 If the `Encrypted` is `Yes`, store these environment variables in Travis using `travis encrypt` ([instructions here](https://git.cogolo.net/platform/wiki/wiki/Travis#usage)).
 
