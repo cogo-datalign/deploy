@@ -62,7 +62,7 @@ if [[ $TRAVIS_TAG == *"canary"* || $TRAVIS_TAG == *"multi"* ]]; then
     kubectl rollout status -n $KUBE_NAMESPACE $deployment
   done
 
-  if [[ $TRAVIS_TAG == *"canary"*]]; then
+  if [[ $TRAVIS_TAG == *"canary"* ]]; then
     exit 0
   fi
 fi
