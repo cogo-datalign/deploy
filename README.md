@@ -27,7 +27,7 @@ automated tagged deployments to work.
 | KUBE_DEPLOYMENTS | Comma seperated list of deployments, e.g. deployment/senderd | No |
 | KUBE_CONTAINERS | Comma seperated list of containers to deploy | No |
 | KUBE_TOKEN_CANARY | Optional, Kubernetes token with write access to this namespace | Yes |
-| KUBE_SERVER_CARNARY | Optional, server IP for Kubernetes, e.g. https://sink.cogolo.net | No |
+| KUBE_SERVER_CANARY | Optional, server IP for Kubernetes, e.g. https://sink.cogolo.net | No |
 | KUBE_CA_CANARY | Optional, if the server IP requires a CA | No |
 | KUBE_DEPLOYMENTS_CANARY | Optional, comma seperated list of deployments, e.g. deployment/senderd | No |
 | KUBE_CONTAINERS_CANARY | Optional, comma seperated list of containers to deploy | No |
