@@ -48,7 +48,7 @@ if [[ $TRAVIS_TAG == *"canary"* || $TRAVIS_TAG == *"multi"* ]]; then
 
   for KUBERNETES_YAML in `find ./k8s-canary/ -name '*.yaml'` ; 
   do
-    sed -i 's/{{IMAGE_TAG}}/$TRAVIS_TAG/g' $KUBERNETES_YAML
+    sed -i 's/{{IMAGE_TAG}}/"$TRAVIS_TAG"/g' $KUBERNETES_YAML
     kubectl apply -n $KUBE_NAMESPACE -f $KUBERNETES_YAML
   done
 
@@ -56,6 +56,12 @@ if [[ $TRAVIS_TAG == *"canary"* || $TRAVIS_TAG == *"multi"* ]]; then
   do
     DEPLOYMENT_NAME=$(echo "$KUBERNETES_YAML" | cut -f 1 -d '.')
     kubectl rollout status -n $KUBE_NAMESPACE $DEPLOYMENT_NAME
+  done
+
+  IFS=',' read -r -a DEPLOYMENTS <<< "$KUBE_DEPLOYMENTS_CANARY"
+
+  for deployment in "${DEPLOYMENTS[@]}"; do
+    kubectl rollout status -n $KUBE_NAMESPACE $deployment
   done
 
   if [[ $TRAVIS_TAG == *"canary"* ]]; then
@@ -75,12 +81,17 @@ sed -i 's/current-context: ""/current-context: cluster/g' $KUBE_CONFIG
 
 for KUBERNETES_YAML in `find ./k8s/ -name '*.yaml'` ; 
 do
-  sed -i 's/{{IMAGE_TAG}}/$TRAVIS_TAG/g' $KUBERNETES_YAML
+  sed -i 's/{{IMAGE_TAG}}/"$TRAVIS_TAG"/g' $KUBERNETES_YAML
   kubectl apply -n $KUBE_NAMESPACE -f $KUBERNETES_YAML
 done
 
-for KUBERNETES_YAML in `find ./k8s/ -name '*.yaml'` ; 
-do
-  DEPLOYMENT_NAME=$(echo "$KUBERNETES_YAML" | cut -f 1 -d '.')
-  kubectl rollout status -n $KUBE_NAMESPACE $DEPLOYMENT_NAME
+# Here KUBE_DEPLOYMENTS can be one or many, e.g.
+# deployment/senderd,deployment/ratesd or just cronjob/test.
+# For deployYAML this is ONLY for monitoring purposes inside
+# travisCI
+IFS=',' read -r -a DEPLOYMENTS <<< "$KUBE_DEPLOYMENTS"
+
+# Ensure successful rollout
+for deployment in "${DEPLOYMENTS[@]}"; do
+  kubectl rollout status -n $KUBE_NAMESPACE $deployment
 done
