@@ -48,7 +48,7 @@ if [[ $TRAVIS_TAG == *"canary"* || $TRAVIS_TAG == *"multi"* ]]; then
 
   for KUBERNETES_YAML in `find ./k8s-canary/ -name '*.yaml'` ; 
   do
-    sed -i 's/{{IMAGE_TAG}}/"$TRAVIS_TAG"/g' $KUBERNETES_YAML
+    sed -i 's/{{IMAGE_TAG}}/'"$TRAVIS_TAG"'/g' $KUBERNETES_YAML
     kubectl apply -n $KUBE_NAMESPACE -f $KUBERNETES_YAML
   done
 
@@ -81,7 +81,7 @@ sed -i 's/current-context: ""/current-context: cluster/g' $KUBE_CONFIG
 
 for KUBERNETES_YAML in `find ./k8s/ -name '*.yaml'` ; 
 do
-  sed -i 's/{{IMAGE_TAG}}/"$TRAVIS_TAG"/g' $KUBERNETES_YAML
+  sed -i 's/{{IMAGE_TAG}}/'"$TRAVIS_TAG"'/g' $KUBERNETES_YAML
   kubectl apply -n $KUBE_NAMESPACE -f $KUBERNETES_YAML
 done
 
