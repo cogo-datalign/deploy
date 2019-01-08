@@ -38,7 +38,6 @@ curl --silent https://raw.git.cogolo.net/kubes/deploy/master/config >> $KUBE_CON
 if [[ $TRAVIS_TAG == *"canary"* || $TRAVIS_TAG == *"multi"* ]]; then
   kubectl config set users.default.token "$KUBE_TOKEN_CANARY"
   kubectl config set clusters.cluster.server "$KUBE_SERVER_CANARY"
-  kubectl config set clusters.cluster.certificate-authority-data "$KUBE_CA_CANARY"
 
   if [ -n "$KUBE_CA_CANARY" ]; then
     kubectl config set clusters.cluster.certificate-authority-data "$KUBE_CA_CANARY"
@@ -59,7 +58,7 @@ if [[ $TRAVIS_TAG == *"canary"* || $TRAVIS_TAG == *"multi"* ]]; then
     kubectl rollout status -n $KUBE_NAMESPACE $DEPLOYMENT_NAME
   done
 
-  if [[ $TRAVIS_TAG == *"canary"*]]; then
+  if [[ $TRAVIS_TAG == *"canary"* ]]; then
     exit 0
   fi
 fi
