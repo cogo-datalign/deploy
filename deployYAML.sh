@@ -53,9 +53,10 @@ if [[ $TRAVIS_TAG == *"canary"* || $TRAVIS_TAG == *"multi"* ]]; then
     kubectl apply -f $KUBERNETES_YAML
   done
 
-  # Ensure successful rollout
-  for deployment in "${DEPLOYMENTS[@]}"; do
-    kubectl rollout status -n $KUBE_NAMESPACE $deployment
+  for KUBERNETES_YAML in `find ./k8s-canary/ -name '*.yaml'` ; 
+  do
+    DEPLOYMENT_NAME=$(echo "$KUBERNETES_YAML" | cut -f 1 -d '.')
+    kubectl rollout status -n $KUBE_NAMESPACE $DEPLOYMENT_NAME
   done
 
   if [[ $TRAVIS_TAG == *"canary"*]]; then
@@ -79,7 +80,8 @@ do
   kubectl apply -f $KUBERNETES_YAML
 done
 
-# for KUBERNETES_YAML in `find ./k8s/ -name '*.yaml'` ; 
-# do
-#   kubectl rollout status -n $KUBE_NAMESPACE $deployment
-# done
+for KUBERNETES_YAML in `find ./k8s/ -name '*.yaml'` ; 
+do
+  DEPLOYMENT_NAME=$(echo "$KUBERNETES_YAML" | cut -f 1 -d '.')
+  kubectl rollout status -n $KUBE_NAMESPACE $DEPLOYMENT_NAME
+done
