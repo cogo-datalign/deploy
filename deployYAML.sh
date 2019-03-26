@@ -6,6 +6,12 @@ if [ -z "$TRAVIS_TAG" ]; then
   exit 0
 fi
 
+# Use v1.13.2 unless --latest is specified
+VERSION=v1.13.2
+if [[ $1 == "--latest" ]]; then
+	VERSION=$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)
+fi
+
 # Wait for the tag to build in docker.cogolo.net
 for i in $(seq 1 60); do
   curl --output /dev/null --silent --head --fail "https://docker.cogolo.net/api/v1/repository/$DOCKER_ORG/$DOCKER_REPO/tag/$TRAVIS_TAG/images" -H "Authorization: Bearer $OAUTH_TOKEN" && {
@@ -24,7 +30,7 @@ if [ -z "$DONE" ]; then
 fi
  
 # Download the stable version of Kubectl
-curl -LO --silent https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl
+curl -LO --silent https://storage.googleapis.com/kubernetes-release/release/$VERSION/bin/linux/amd64/kubectl
 chmod +x ./kubectl
 sudo mv ./kubectl /usr/local/bin/kubectl
 
