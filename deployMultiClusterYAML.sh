@@ -26,54 +26,29 @@ curl --silent https://raw.git.cogolo.net/kubes/deploy/master/config >> $KUBE_CON
 
 # Ability to do canary
 if [[ $TRAVIS_TAG == *"canary"* ]]; then
-    kubectl config set users.default.token "$KUBE_TOKEN_CANARY"
-    kubectl config set clusters.cluster.server "$KUBE_SERVER_CANARY"
-
-    if [ -n "$KUBE_CA_CANARY" ]; then
-        kubectl config set clusters.cluster.certificate-authority-data "$KUBE_CA_CANARY"
-    fi
-
-    # manually set the current context; "kubectl config set-context cluster" doesn't work
-    sed -i 's/current-context: ""/current-context: cluster/g' $KUBE_CONFIG
-    sed -i 's/server: /server: https:\/\//g' $KUBE_CONFIG
-
-    for KUBERNETES_YAML in `find ./k8s-canary/ -name '*.yaml'` ; 
-    do
-        sed -i 's/{{IMAGE_TAG}}/'"$TRAVIS_TAG"'/g' $KUBERNETES_YAML
-        kubectl apply -n $KUBE_NAMESPACE -f $KUBERNETES_YAML
-    
-        DEPLOYMENT_NAME=$(echo "$KUBERNETES_YAML" | cut -f 1 -d '.')
-        kubectl rollout status -n $KUBE_NAMESPACE $DEPLOYMENT_NAME
-
-        IFS=',' read -r -a DEPLOYMENTS <<< "$KUBE_DEPLOYMENTS_CANARY"
-
-        for deployment in "${DEPLOYMENTS[@]}"; do
-            kubectl rollout status -n $KUBE_NAMESPACE $deployment
-        done
-    done
-
-    if [[ $TRAVIS_TAG == *"canary"* ]]; then
-        exit 0
-    fi
+    FIND_ARGS="-name *canary*.yaml"
+else
+    FIND_ARGS="-name *.yaml ! -name *canary*"
 fi
 
-for KUBERNETES_YAML in `find ./k8s/ -name '*.yaml'` ; 
+for KUBERNETES_YAML in `find ./k8s $FIND_ARGS`; 
 do
-    KUBE_SERVER=$(echo $KUBERNETES_YAML | sed -e "s/.yaml//" -e "s/.\/k8s\///" | awk -F "-" '{print $1}')
-    KUBE_NAMESPACE=$(grep 'namespace' $KUBERNETES_YAML | sed 's/namespace://')
-    DOCKER_ORG=$(grep 'image:' $KUBERNETES_YAML | awk -F "/" '{ print $2 }')
-    DOCKER_REPO=$(grep 'image:' $KUBERNETES_YAML | awk -F "/" '{ print $3 }' | awk -F ":" '{ print $1 }')
+    KUBE_SERVER=$(basename $KUBERNETES_YAML | awk -F "-" '{print $1}')
+    KUBE_NAMESPACE=$(grep -oP "namespace:\s*\K((\w+-?)+)" $KUBERNETES_YAML)
+    DOCKER_ORG=$(grep -oP "image: [a-zA-Z0-9\-\.]+\/\K([a-zA-Z0-9\-\.]+)" $KUBERNETES_YAML)
+    DOCKER_REPO=$(grep -oP "image: [a-zA-Z0-9\-\.]+\/[a-zA-Z0-9\-\.]+\/\K([a-zA-Z0-9\-\.]+)" $KUBERNETES_YAML)
 
     # Wait for the tag to build in docker.cogolo.net
     for i in $(seq 1 60); do
-        curl --output /dev/null --silent --head --fail "https://docker.cogolo.net/api/v1/repository/$DOCKER_ORG/$DOCKER_REPO/tag/$TRAVIS_TAG/images" -H "Authorization: Bearer $OAUTH_TOKEN" && {
+        curl --output /dev/null --silent --head --fail "https://docker.cogolo.net/api/v1/repository/$DOCKER_ORG/$DOCKER_REPO/tag/$TRAVIS_TAG/images" -H "Authorization: Bearer $OAUTH_TOKEN"
+        if [[ $? == "0" ]]; then
             DONE="true"
             break
-        } || {
+        else
             echo "Waiting for tag $TRAVIS_TAG to build in docker.cogolo.net..."
             echo "https://docker.cogolo.net/api/v1/repository/$DOCKER_ORG/$DOCKER_REPO/tag/$TRAVIS_TAG/images"
             sleep 5
-        }
+        fi
     done
 
     if [ -z "$DONE" ]; then
