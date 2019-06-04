@@ -63,15 +63,11 @@ do
     kubectl config set users.default.token "$KUBE_TOKEN" > /dev/null
     kubectl config set clusters.cluster.server "$KUBE_SERVER" > /dev/null
 
-    if [ -n "$KUBE_CA" ]; then
-        kubectl config set clusters.cluster.certificate-authority-data "$KUBE_CA"
-    fi
-
     # manually set the current context; "kubectl config set-context cluster" doesn't work
     sed -i 's/current-context: ""/current-context: cluster/g' $KUBE_CONFIG
     sed -i 's/server: /server: https:\/\//g' $KUBE_CONFIG
     
-    sed -i 's/{{IMAGE_TAG}}/'"$TRAVIS_TAG"'/g' $KUBERNETES_YAML
+    sed -i "s/{{IMAGE_TAG}}/$TRAVIS_TAG/g" $KUBERNETES_YAML
     kubectl apply -n $KUBE_NAMESPACE -f $KUBERNETES_YAML
 
     # Here KUBE_DEPLOYMENTS can be one or many, e.g.
