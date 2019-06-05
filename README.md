@@ -43,7 +43,7 @@ git push origin --tags
 
 To start a canary deploy, the tag must include the word `canary`.
 
-# Deploy.sh/Deploy.YAML
+# Deploy.sh/DeployYAML.sh
 
 ## Travis Configuration
 
