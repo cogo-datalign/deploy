@@ -1,12 +1,49 @@
-# Deploy
+# Multi-Cluster Deploy
 
 Deployment automation for Kubernetes in TravisCI
 
 To get automated deployments:
 
 1. Setup the docker.cogolo.net repository to trigger on `tags/.+` builds
-1. Follow the Travis Configuration guide, then
-1. follow the steps to trigger a deployment.
+2. Follow the Travis Configuration guide, then
+3. follow the steps to trigger a deployment.
+
+### Formatting Kubernetes YAMLs
+
+Kubernetes YAMLs should be placed in the `k8s` directory with file names formatted as follows:
+
+`<cluster-FQDN>-<file-type>.yaml`
+
+Example: kubes2.cogolo.net-deployment.yaml
+
+Append `-canary` for canary deploys:
+
+`<cluster-FQDN>-<file-type>-canary.yaml`
+
+Example: kubes2.cogolo.net-deployment-canary.yaml
+
+### Travis YAML
+
+Add the following to your `travis.yml` file:
+
+```yml
+after_success:
+  - bash <(curl -s https://raw.git.cogolo.net/kubes/deploy/master/deployMultiClusterYAML.sh)
+```
+
+## Triggering a deployment
+
+Once the configuration above is done, you can tag a release by running the following git commands:
+
+```bash
+git checkout master && git pull origin master
+git tag v0.01
+git push origin --tags
+```
+
+To start a canary deploy, the tag must include the word `canary`.
+
+# Deploy.sh/DeployYAML.sh
 
 ## Travis Configuration
 
