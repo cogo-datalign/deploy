@@ -122,8 +122,8 @@ automated merge-to-master deployments to work.
 
 | Environment Variable  | Purpose | Encrypted |
 | ------------- | ------------- | -------------- |
-| DOCKER_ORG  | Organization associated with this repositories docker repo | No |
-| DOCKER_REPO  | Name of this repositories docker repo  | No |
+| DOCKER_ORG  | Organization associated with this repository's docker repo | No |
+| DOCKER_REPO  | Name of this repository's docker repo  | No |
 | STAGING_TAG | Name of the tag of the staging image | No |
 | KUBE_TOKEN | Kubernetes token with write access to this namespace | Yes |
 | KUBE_SERVER | Server IP for Kubernetes, e.g. https://sink.cogolo.net | No |
