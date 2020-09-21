@@ -134,7 +134,7 @@ automated merge-to-master deployments to work.
 
 If the `Encrypted` is `Yes`, store these environment variables in Travis using `travis encrypt` ([instructions here](https://git.cogolo.net/platform/wiki/wiki/Travis#usage)).
 
-### Formatting Staging Kubernetes YAMLs
+### Formatting staging Kubernetes YAMLs
 
 Staging Kubernetes YAMLs should be placed in the `k8s-staging` directory
 
@@ -147,6 +147,6 @@ after_success:
   - bash <(curl -s https://raw.git.cogolo.net/kubes/deploy/master/deployStagingYAML.sh)
 ```
 
-## Triggering a deployment
+## Triggering a staging deployment
 
 Once the configuration above is done, staging deployments will be rolled out on merges to master.
