@@ -61,6 +61,7 @@ automated tagged deployments to work.
 | KUBE_TOKEN | Kubernetes token with write access to this namespace | Yes |
 | KUBE_SERVER | Server IP for Kubernetes, e.g. https://sink.cogolo.net | No |
 | KUBE_CA | Optional, if the server IP requires a CA | No |
+| KUBE_DIRECTORY | Optional, relative path to the directory containing Kubernetes YAMLs | No |
 | KUBE_DEPLOYMENTS | Comma seperated list of deployments, e.g. deployment/senderd | No |
 | KUBE_CONTAINERS | Comma seperated list of containers to deploy | No |
 | KUBE_TOKEN_CANARY | Optional, Kubernetes token with write access to this namespace | Yes |

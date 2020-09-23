@@ -85,7 +85,12 @@ fi
 # manually set the current context; "kubectl config set-context cluster" doesn't work
 sed -i 's/current-context: ""/current-context: cluster/g' $KUBE_CONFIG
 
-for KUBERNETES_YAML in `find ./k8s/ -name '*.yaml'` ; 
+FIND_DIRECTORY="./k8s/"
+if [ -n "$KUBE_DIRECTORY" ]; then
+  FIND_DIRECTORY=$KUBE_DIRECTORY
+fi
+
+for KUBERNETES_YAML in `find $FIND_DIRECTORY -name '*.yaml'` ;
 do
   sed -i 's/{{IMAGE_TAG}}/'"$TRAVIS_TAG"'/g' $KUBERNETES_YAML
   kubectl apply -n $KUBE_NAMESPACE -f $KUBERNETES_YAML
