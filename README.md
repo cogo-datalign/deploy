@@ -70,6 +70,7 @@ automated tagged deployments to work.
 | KUBE_DEPLOYMENTS_CANARY | Optional, comma seperated list of deployments, e.g. deployment/senderd | No |
 | KUBE_CONTAINERS_CANARY | Optional, comma seperated list of containers to deploy | No |
 | KUBE_NAMESPACE | Namespace where the deployments are currently running | No |
+| KUBE_NAMESPACE_CANARY | Optional, namespace where the canary deployments are running. Defaults to $KUBE_NAMESPACE | No |
 | KUBE_SECRET | Optional, only required if Quay repo is private. The name of the kubes secret that willa llow the deployment to pull the docker image. | No |
 | OAUTH_TOKEN | Optional, only required if Quay repo is private. Access token allows us to use the Quay API (see instructions below) | Yes |
 

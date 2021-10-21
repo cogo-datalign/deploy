@@ -52,22 +52,26 @@ if [[ $TRAVIS_TAG == *"canary"* || $TRAVIS_TAG == *"multi"* ]]; then
   # manually set the current context; "kubectl config set-context cluster" doesn't work
   sed -i 's/current-context: ""/current-context: cluster/g' $KUBE_CONFIG
 
+  if [ -z "$KUBE_NAMESPACE_CANARY" ]; then
+    KUBE_NAMESPACE_CANARY=$KUBE_NAMESPACE
+  fi
+
   for KUBERNETES_YAML in `find ./k8s-canary/ -name '*.yaml'` ; 
   do
     sed -i 's/{{IMAGE_TAG}}/'"$TRAVIS_TAG"'/g' $KUBERNETES_YAML
-    kubectl apply -n $KUBE_NAMESPACE -f $KUBERNETES_YAML
+    kubectl apply -n $KUBE_NAMESPACE_CANARY -f $KUBERNETES_YAML
   done
 
   for KUBERNETES_YAML in `find ./k8s-canary/ -name '*.yaml'` ; 
   do
     DEPLOYMENT_NAME=$(echo "$KUBERNETES_YAML" | cut -f 1 -d '.')
-    kubectl rollout status -n $KUBE_NAMESPACE $DEPLOYMENT_NAME
+    kubectl rollout status -n $KUBE_NAMESPACE_CANARY $DEPLOYMENT_NAME
   done
 
   IFS=',' read -r -a DEPLOYMENTS <<< "$KUBE_DEPLOYMENTS_CANARY"
 
   for deployment in "${DEPLOYMENTS[@]}"; do
-    kubectl rollout status -n $KUBE_NAMESPACE $deployment
+    kubectl rollout status -n $KUBE_NAMESPACE_CANARY $deployment
   done
 
   if [[ $TRAVIS_TAG == *"canary"* ]]; then
