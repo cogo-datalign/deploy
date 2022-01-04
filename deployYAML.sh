@@ -1,30 +1,33 @@
 #!/usr/bin/env bash
 
-if [ -z "$TRAVIS_TAG" ]; then
-  echo "No travis tags were specified."
+if [ "$GITHUB_REF_TYPE" == "tag" ]; then
+  echo "No tags were specified."
   echo "Doing nothing."
   exit 0
 fi
 
-# Use v1.13.2 unless --latest is specified
-VERSION=v1.13.2
+# refs/heads/my-tag => my-tag
+GITHUB_TAG=$(echo $GITHUB_REF | sed 's/refs\/heads//g')
+
+# Use v1.21.2 unless --latest is specified
+VERSION=v1.21.2
 if [[ $1 == "--latest" ]]; then
 	VERSION=$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)
 fi
 
 # Wait for the tag to build in docker.cogolo.net
 for i in $(seq 1 300); do
-  curl --output /dev/null --silent --head --fail "https://docker.cogolo.net/api/v1/repository/$DOCKER_ORG/$DOCKER_REPO/tag/$TRAVIS_TAG/images" -H "Authorization: Bearer $OAUTH_TOKEN" && {
+  curl --output /dev/null --silent --head --fail "https://docker.cogolo.net/api/v1/repository/$DOCKER_ORG/$DOCKER_REPO/tag/$GITHUB_TAG/images" -H "Authorization: Bearer $OAUTH_TOKEN" && {
     DONE="true"
     break
   } || {
-    echo "Waiting for tag $TRAVIS_TAG to build in docker.cogolo.net..."
+    echo "Waiting for tag $GITHUB_TAG to build in docker.cogolo.net..."
     sleep 5
   }
 done
 
 if [ -z "$DONE" ]; then
-  echo "Timeout waiting on $TRAVIS_TAG to build in docker.cogolo.net."
+  echo "Timeout waiting on $GITHUB_TAG to build in docker.cogolo.net."
   echo "Exiting."
   exit 1
 fi
@@ -41,7 +44,7 @@ mkdir -p ${HOME}/.kube
 curl --silent https://raw.git.cogolo.net/kubes/deploy/master/config >> $KUBE_CONFIG
 
 # Ability to do canary OR multi deployments
-if [[ $TRAVIS_TAG == *"canary"* || $TRAVIS_TAG == *"multi"* ]]; then
+if [[ $GITHUB_TAG == *"canary"* || $GITHUB_TAG == *"multi"* ]]; then
   kubectl config set users.default.token "$KUBE_TOKEN_CANARY"
   kubectl config set clusters.cluster.server "$KUBE_SERVER_CANARY"
 
@@ -58,7 +61,7 @@ if [[ $TRAVIS_TAG == *"canary"* || $TRAVIS_TAG == *"multi"* ]]; then
 
   for KUBERNETES_YAML in `find ./k8s-canary/ -name '*.yaml'` ; 
   do
-    sed -i 's/{{IMAGE_TAG}}/'"$TRAVIS_TAG"'/g' $KUBERNETES_YAML
+    sed -i 's/{{IMAGE_TAG}}/'"$GITHUB_TAG"'/g' $KUBERNETES_YAML
     kubectl apply -n $KUBE_NAMESPACE_CANARY -f $KUBERNETES_YAML
   done
 
@@ -74,7 +77,7 @@ if [[ $TRAVIS_TAG == *"canary"* || $TRAVIS_TAG == *"multi"* ]]; then
     kubectl rollout status -n $KUBE_NAMESPACE_CANARY $deployment
   done
 
-  if [[ $TRAVIS_TAG == *"canary"* ]]; then
+  if [[ $GITHUB_TAG == *"canary"* ]]; then
     exit 0
   fi
 fi
@@ -96,7 +99,7 @@ fi
 
 for KUBERNETES_YAML in `find $FIND_DIRECTORY -name '*.yaml'` ;
 do
-  sed -i 's/{{IMAGE_TAG}}/'"$TRAVIS_TAG"'/g' $KUBERNETES_YAML
+  sed -i 's/{{IMAGE_TAG}}/'"$GITHUB_TAG"'/g' $KUBERNETES_YAML
   kubectl apply -n $KUBE_NAMESPACE -f $KUBERNETES_YAML
 done
 
@@ -136,7 +139,7 @@ fi
 
 for KUBERNETES_YAML in `find ./k8s-aws/ -name '*.yaml'` ; 
 do
-  sed -i 's/{{IMAGE_TAG}}/'"$TRAVIS_TAG"'/g' $KUBERNETES_YAML
+  sed -i 's/{{IMAGE_TAG}}/'"$GITHUB_TAG"'/g' $KUBERNETES_YAML
   kubectl apply -n $KUBE_NAMESPACE_AWS -f $KUBERNETES_YAML
 done
 
