@@ -110,3 +110,38 @@ IFS=',' read -r -a DEPLOYMENTS <<< "$KUBE_DEPLOYMENTS"
 for deployment in "${DEPLOYMENTS[@]}"; do
   kubectl rollout status -n $KUBE_NAMESPACE $deployment
 done
+
+#
+# Deploy to AWS
+#
+
+# manually set AWS cli credentails
+sed -i "s/_AWS_CLUSTER_NAME/$AWS_CLUSTER_NAME/g" $KUBE_CONFIG
+aws configure set aws_access_key_id $AWS_ACCESS_KEY_ID
+aws configure set aws_secret_access_key $AWS_SECRET_ACCESS_KEY
+
+export KUBECONFIG=$KUBE_CONFIG
+kubectl config set clusters.eks.server $KUBE_SERVER_AWS
+
+if [ -n "$KUBE_CA_AWS" ]; then
+  kubectl config set clusters.eks.certificate-authority-data "$KUBE_CA_AWS"
+fi
+
+# manually set the current context; "kubectl config set-context cluster" doesn't work
+sed -i 's/current-context: cluster/current-context: eks/g' $KUBE_CONFIG
+
+if [ -z "$KUBE_NAMESPACE_AWS" ]; then
+  KUBE_NAMESPACE_AWS=$KUBE_NAMESPACE_AWS
+fi
+
+for KUBERNETES_YAML in `find ./k8s-aws/ -name '*.yaml'` ; 
+do
+  sed -i 's/{{IMAGE_TAG}}/'"$TRAVIS_TAG"'/g' $KUBERNETES_YAML
+  kubectl apply -n $KUBE_NAMESPACE_AWS -f $KUBERNETES_YAML
+done
+
+IFS=',' read -r -a DEPLOYMENTS <<< "$KUBE_DEPLOYMENTS_AWS"
+
+for deployment in "${DEPLOYMENTS[@]}"; do
+  kubectl rollout status -n $KUBE_NAMESPACE_AWS $deployment
+done

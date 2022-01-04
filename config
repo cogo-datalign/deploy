@@ -4,15 +4,34 @@ clusters:
     certificate-authority-data:
     server: 
   name: cluster
+- cluster:
+    certificate-authority-data:
+    server: 
+  name: eks
 contexts:
 - context:
     cluster: cluster
     user: default
   name: cluster
-current-context:
+- context:
+    cluster: eks
+    user: eks
+    namespace: quake
+  name: eks
+current-context: cluster
 kind: Config
 preferences: {}
 users:
 - name: default
   user:
     token:
+- name: eks
+  user:
+    exec:
+      apiVersion: client.authentication.k8s.io/v1alpha1
+      command: aws
+      args:
+      - eks
+      - get-token
+      - --cluster-name
+      - _AWS_CLUSTER_NAME
