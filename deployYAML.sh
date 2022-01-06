@@ -1,16 +1,7 @@
 #!/usr/bin/env bash
 
-echo "RE: $GITHUB_REF"
-echo "REF NAME: $GITHUB_REF_NAME"
-echo "REF TYPE: $GITHUB_REF_TYPE"
-
-if [ "$GITHUB_REF_TYPE" != "tag" ]; then
-  echo "No tags were specified."
-  echo "Doing nothing."
-  exit 0
-fi
-
-GITHUB_TAG=$GITHUB_REF_NAME
+# refs/heads/my-tag => my-tag
+GITHUB_TAG=$(echo $GITHUB_REF | sed 's/refs\/heads\///g')
 
 # Wait for the tag to build in docker.cogolo.net
 for i in $(seq 1 300); do
