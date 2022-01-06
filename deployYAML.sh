@@ -7,7 +7,7 @@ if [[ "$GITHUB_REF" != *"tags"* ]]; then
 fi
 
 # refs/heads/my-tag => my-tag
-GITHUB_TAG=$(echo $GITHUB_REF | sed 's/refs\/heads\///g')
+GITHUB_TAG=$(echo $GITHUB_REF | sed 's/refs\/tags\///g')
 
 # Wait for the tag to build in docker.cogolo.net
 for i in $(seq 1 300); do
