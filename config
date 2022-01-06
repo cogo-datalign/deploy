@@ -8,7 +8,7 @@ contexts:
 - context:
     cluster: eks
     user: eks
-    namespace: quake
+    namespace: leadalign
   name: eks
 current-context: eks
 kind: Config
