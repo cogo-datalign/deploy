@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-if [ "$GITHUB_REF_TYPE" == "tag" ]; then
+if [ "$GITHUB_REF_TYPE" != "tag" ]; then
   echo "No tags were specified."
   echo "Doing nothing."
   exit 0
