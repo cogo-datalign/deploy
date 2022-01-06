@@ -1,5 +1,11 @@
 #!/usr/bin/env bash
 
+if [[ "$GITHUB_REF" != *"tags"* ]]; then
+    echo "No tags were specified."
+    echo "Doing nothing."
+    exit 0
+fi
+
 # refs/heads/my-tag => my-tag
 GITHUB_TAG=$(echo $GITHUB_REF | sed 's/refs\/heads\///g')
 
