@@ -2,7 +2,7 @@ apiVersion: v1
 clusters:
 - cluster:
     certificate-authority-data: _AWS_CA_DATA
-    server: 
+    server: _AWS_SERVER
   name: eks
 contexts:
 - context:
