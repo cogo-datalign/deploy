@@ -45,8 +45,6 @@ sed -i "s/_AWS_SECRET_ACCESS_KEY/$(echo $AWS_SECRET_ACCESS_KEY | sed 's/\//\\\//
 sed -i "s/_AWS_SERVER/$(echo $KUBE_SERVER_AWS | sed 's/\//\\\//g')/g" $KUBECONFIG
 sed -i "s/_AWS_CA_DATA/$KUBE_CA_AWS/g" $KUBECONFIG
 
-cat $KUBECONFIG
-
 for KUBERNETES_YAML in `find ./k8s-aws/ -name '*.yaml'` ; 
 do
   sed -i 's/{{IMAGE_TAG}}/'"$GITHUB_TAG"'/g' $KUBERNETES_YAML
