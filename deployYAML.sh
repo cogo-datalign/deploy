@@ -1,13 +1,5 @@
 #!/usr/bin/env bash
 
-echo "ref type: $GITHUB_REF_TYPE"
-
-if [ "$GITHUB_REF_TYPE" != "tag" ]; then
-  echo "No tags were specified."
-  echo "Doing nothing."
-  exit 0
-fi
-
 GITHUB_TAG=$GITHUB_REF_NAME
 
 # Wait for the tag to build in docker.cogolo.net
