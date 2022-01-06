@@ -27,3 +27,8 @@ users:
       - get-token
       - --cluster-name
       - _AWS_CLUSTER_NAME
+      env:
+        - name: AWS_ACCESS_KEY_ID
+          value: "_AWS_ACCESS_KEY_ID"
+        - name: AWS_SECRET_ACCESS_KEY
+          value: "_AWS_SECRET_ACCESS_KEY"
