@@ -1,13 +1,8 @@
 #!/usr/bin/env bash
 
-if [[ "$GITHUB_REF" != *"tags"* ]]; then
-    echo "No tags were specified."
-    echo "Doing nothing."
-    exit 0
-fi
-
-# refs/heads/my-tag => my-tag
-GITHUB_TAG=$(echo $GITHUB_REF | sed 's/refs\/tags\///g')
+# refs/tags/my-tag => my-tag
+# refs/heads/my-branch => my-branch
+GITHUB_TAG=$(echo $GITHUB_REF | sed 's/refs\/tags\///g' | sed 's/refs\/heads\///g')
 
 # Wait for the tag to build in docker.cogolo.net
 for i in $(seq 1 300); do
@@ -36,7 +31,7 @@ curl --silent https://raw.git.cogolo.net/clickx/deploy/master/config >> $KUBECON
 # Deploy to AWS
 #
 
-# manually set AWS cli credentails
+# manually set AWS cli credentials
 sed -i "s/_AWS_CLUSTER_NAME/$AWS_CLUSTER_NAME/g" $KUBECONFIG
 sed -i "s/_AWS_ACCESS_KEY_ID/$AWS_ACCESS_KEY_ID/g" $KUBECONFIG
 sed -i "s/_AWS_SECRET_ACCESS_KEY/$(echo $AWS_SECRET_ACCESS_KEY | sed 's/\//\\\//g')/g" $KUBECONFIG
@@ -45,7 +40,7 @@ sed -i "s/_AWS_SECRET_ACCESS_KEY/$(echo $AWS_SECRET_ACCESS_KEY | sed 's/\//\\\//
 sed -i "s/_AWS_SERVER/$(echo $KUBE_SERVER_AWS | sed 's/\//\\\//g')/g" $KUBECONFIG
 sed -i "s/_AWS_CA_DATA/$KUBE_CA_AWS/g" $KUBECONFIG
 
-for KUBERNETES_YAML in `find ./k8s-aws/ -name '*.yaml'` ; 
+for KUBERNETES_YAML in `find "./$KUBE_YAML_FOLDER/" -name '*.yaml'` ;
 do
   sed -i 's/{{IMAGE_TAG}}/'"$GITHUB_TAG"'/g' $KUBERNETES_YAML
   kubectl --insecure-skip-tls-verify apply -n $KUBE_NAMESPACE_AWS -f $KUBERNETES_YAML
