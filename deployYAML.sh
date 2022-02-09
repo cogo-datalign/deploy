@@ -1,27 +1,27 @@
 #!/usr/bin/env bash
 
-if [[ "$GITHUB_REF" != *"tags"* ]]; then
-    echo "No tags were specified."
-    echo "Doing nothing."
-    exit 0
-fi
+# $GITHUB_REF_NAME is either the branch or tag name that triggered the workflow run
+# https://docs.github.com/en/actions/learn-github-actions/environment-variables#default-environment-variables
 
-# refs/heads/my-tag => my-tag
-GITHUB_TAG=$(echo $GITHUB_REF | sed 's/refs\/tags\///g')
+if [[ "$GITHUB_REF" != *"tags"*  && "$GITHUB_REF_NAME" != "master" ]]; then
+  echo "No tags were specified."
+  echo "Doing nothing."
+  exit 0
+fi
 
 # Wait for the tag to build in docker.cogolo.net
 for i in $(seq 1 300); do
-  curl --output /dev/null --cipher 'DEFAULT:!DH' --silent --head --fail "https://docker.cogolo.net/api/v1/repository/$DOCKER_ORG/$DOCKER_REPO/tag/$GITHUB_TAG/images" -H "Authorization: Bearer $OAUTH_TOKEN" && {
+  curl --output /dev/null --cipher 'DEFAULT:!DH' --silent --head --fail "https://docker.cogolo.net/api/v1/repository/$DOCKER_ORG/$DOCKER_REPO/tag/$GITHUB_REF_NAME/images" -H "Authorization: Bearer $OAUTH_TOKEN" && {
     DONE="true"
     break
   } || {
-    echo "Waiting for tag $GITHUB_TAG to build in docker.cogolo.net..."
+    echo "Waiting for tag '$GITHUB_REF_NAME' to build in docker.cogolo.net..."
     sleep 5
   }
 done
 
 if [ -z "$DONE" ]; then
-  echo "Timeout waiting on $GITHUB_TAG to build in docker.cogolo.net."
+  echo "Timeout waiting on '$GITHUB_REF_NAME' to build in docker.cogolo.net."
   echo "Exiting."
   exit 1
 fi
@@ -36,23 +36,24 @@ curl --silent https://raw.git.cogolo.net/clickx/deploy/master/config >> $KUBECON
 # Deploy to AWS
 #
 
-# manually set AWS cli credentails
+# manually set AWS cli credentials
 sed -i "s/_AWS_CLUSTER_NAME/$AWS_CLUSTER_NAME/g" $KUBECONFIG
 sed -i "s/_AWS_ACCESS_KEY_ID/$AWS_ACCESS_KEY_ID/g" $KUBECONFIG
-sed -i "s/_AWS_SECRET_ACCESS_KEY/$(echo $AWS_SECRET_ACCESS_KEY | sed 's/\//\\\//g')/g" $KUBECONFIG
+sed -i "s/_KUBE_NAMESPACE_AWS/$KUBE_NAMESPACE_AWS/g" $KUBECONFIG
+sed -i "s/_AWS_SECRET_ACCESS_KEY/$(echo "$AWS_SECRET_ACCESS_KEY" | sed 's/\//\\\//g')/g" $KUBECONFIG
 
 # set kubes server and CA data
-sed -i "s/_AWS_SERVER/$(echo $KUBE_SERVER_AWS | sed 's/\//\\\//g')/g" $KUBECONFIG
+sed -i "s/_AWS_SERVER/$(echo "$KUBE_SERVER_AWS" | sed 's/\//\\\//g')/g" $KUBECONFIG
 sed -i "s/_AWS_CA_DATA/$KUBE_CA_AWS/g" $KUBECONFIG
 
-for KUBERNETES_YAML in `find ./k8s-aws/ -name '*.yaml'` ; 
+for KUBERNETES_YAML in `find "./$KUBE_YAML_FOLDER/" -name '*.yaml'` ;
 do
-  sed -i 's/{{IMAGE_TAG}}/'"$GITHUB_TAG"'/g' $KUBERNETES_YAML
-  kubectl --insecure-skip-tls-verify apply -n $KUBE_NAMESPACE_AWS -f $KUBERNETES_YAML
+  sed -i 's/{{IMAGE_TAG}}/'"$GITHUB_REF_NAME"'/g' "$KUBERNETES_YAML"
+  kubectl --insecure-skip-tls-verify apply -n "$KUBE_NAMESPACE_AWS" -f "$KUBERNETES_YAML"
 done
 
 IFS=',' read -r -a DEPLOYMENTS <<< "$KUBE_DEPLOYMENTS_AWS"
 
 for deployment in "${DEPLOYMENTS[@]}"; do
-  kubectl --insecure-skip-tls-verify rollout status -n $KUBE_NAMESPACE_AWS $deployment
+  kubectl --insecure-skip-tls-verify rollout status -n "$KUBE_NAMESPACE_AWS" $deployment
 done
