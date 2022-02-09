@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # Github Actions default environment variables
-# https://docs.github.com/en/enterprise-server@3.3/actions/learn-github-actions/environment-variables
+# https://docs.github.com/en/enterprise-server@3.2/actions/learn-github-actions/environment-variables#default-environment-variables
 
 if [[ "$GITHUB_REF" != *"tags"* && "$GITHUB_REF" != "refs/heads/master" ]]; then
   echo "No tags were specified."
