@@ -3,6 +3,12 @@
 # $GITHUB_REF_NAME is either the branch or tag name that triggered the workflow run
 # https://docs.github.com/en/actions/learn-github-actions/environment-variables#default-environment-variables
 
+if [[ "$GITHUB_REF" != *"tags"*  && "$GITHUB_REF_NAME" != "master" ]]; then
+  echo "No tags were specified."
+  echo "Doing nothing."
+  exit 0
+fi
+
 # Wait for the tag to build in docker.cogolo.net
 for i in $(seq 1 300); do
   curl --output /dev/null --cipher 'DEFAULT:!DH' --silent --head --fail "https://docker.cogolo.net/api/v1/repository/$DOCKER_ORG/$DOCKER_REPO/tag/$GITHUB_REF_NAME/images" -H "Authorization: Bearer $OAUTH_TOKEN" && {
