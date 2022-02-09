@@ -1,27 +1,29 @@
 #!/usr/bin/env bash
 
-# $GITHUB_REF_NAME is either the branch or tag name that triggered the workflow run
-# https://docs.github.com/en/actions/learn-github-actions/environment-variables#default-environment-variables
+# Github Actions default environment variables
+# https://docs.github.com/en/enterprise-server@3.3/actions/learn-github-actions/environment-variables
 
-if [[ "$GITHUB_REF" != *"tags"*  && "$GITHUB_REF_NAME" != "master" ]]; then
+if [[ "$GITHUB_REF" != *"tags"* && "$GITHUB_REF" != "refs/heads/master" ]]; then
   echo "No tags were specified."
   echo "Doing nothing."
   exit 0
 fi
 
+GITHUB_TAG=$(echo "$GITHUB_REF" | sed 's/refs\/tags\///g' | sed 's/refs\/heads\///g')
+
 # Wait for the tag to build in docker.cogolo.net
 for i in $(seq 1 300); do
-  curl --output /dev/null --cipher 'DEFAULT:!DH' --silent --head --fail "https://docker.cogolo.net/api/v1/repository/$DOCKER_ORG/$DOCKER_REPO/tag/$GITHUB_REF_NAME/images" -H "Authorization: Bearer $OAUTH_TOKEN" && {
+  curl --output /dev/null --cipher 'DEFAULT:!DH' --silent --head --fail "https://docker.cogolo.net/api/v1/repository/$DOCKER_ORG/$DOCKER_REPO/tag/$GITHUB_TAG/images" -H "Authorization: Bearer $OAUTH_TOKEN" && {
     DONE="true"
     break
   } || {
-    echo "Waiting for tag '$GITHUB_REF_NAME' to build in docker.cogolo.net..."
+    echo "Waiting for tag '$GITHUB_TAG' to build in docker.cogolo.net..."
     sleep 5
   }
 done
 
 if [ -z "$DONE" ]; then
-  echo "Timeout waiting on '$GITHUB_REF_NAME' to build in docker.cogolo.net."
+  echo "Timeout waiting on '$GITHUB_TAG' to build in docker.cogolo.net."
   echo "Exiting."
   exit 1
 fi
@@ -48,7 +50,7 @@ sed -i "s/_AWS_CA_DATA/$KUBE_CA_AWS/g" $KUBECONFIG
 
 for KUBERNETES_YAML in `find "./$KUBE_YAML_FOLDER/" -name '*.yaml'` ;
 do
-  sed -i 's/{{IMAGE_TAG}}/'"$GITHUB_REF_NAME"'/g' "$KUBERNETES_YAML"
+  sed -i 's/{{IMAGE_TAG}}/'"$GITHUB_TAG"'/g' "$KUBERNETES_YAML"
   kubectl --insecure-skip-tls-verify apply -n "$KUBE_NAMESPACE_AWS" -f "$KUBERNETES_YAML"
 done
 
