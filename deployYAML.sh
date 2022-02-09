@@ -2,7 +2,7 @@
 
 # refs/tags/my-tag => my-tag
 # refs/heads/my-branch => my-branch
-GITHUB_TAG=$(echo $GITHUB_REF | sed 's/refs\/tags\///g' | sed 's/refs\/heads\///g')
+GITHUB_TAG=$(echo "$GITHUB_REF" | sed 's/refs\/tags\///g' | sed 's/refs\/heads\///g')
 
 # Wait for the tag to build in docker.cogolo.net
 for i in $(seq 1 300); do
@@ -10,13 +10,13 @@ for i in $(seq 1 300); do
     DONE="true"
     break
   } || {
-    echo "Waiting for tag $GITHUB_TAG to build in docker.cogolo.net..."
+    echo "Waiting for tag '$GITHUB_TAG' to build in docker.cogolo.net..."
     sleep 5
   }
 done
 
 if [ -z "$DONE" ]; then
-  echo "Timeout waiting on $GITHUB_TAG to build in docker.cogolo.net."
+  echo "Timeout waiting on '$GITHUB_TAG' to build in docker.cogolo.net."
   echo "Exiting."
   exit 1
 fi
@@ -34,20 +34,21 @@ curl --silent https://raw.git.cogolo.net/clickx/deploy/master/config >> $KUBECON
 # manually set AWS cli credentials
 sed -i "s/_AWS_CLUSTER_NAME/$AWS_CLUSTER_NAME/g" $KUBECONFIG
 sed -i "s/_AWS_ACCESS_KEY_ID/$AWS_ACCESS_KEY_ID/g" $KUBECONFIG
-sed -i "s/_AWS_SECRET_ACCESS_KEY/$(echo $AWS_SECRET_ACCESS_KEY | sed 's/\//\\\//g')/g" $KUBECONFIG
+sed -i "s/_KUBE_NAMESPACE_AWS/$KUBE_NAMESPACE_AWS/g" $KUBECONFIG
+sed -i "s/_AWS_SECRET_ACCESS_KEY/$(echo "$AWS_SECRET_ACCESS_KEY" | sed 's/\//\\\//g')/g" $KUBECONFIG
 
 # set kubes server and CA data
-sed -i "s/_AWS_SERVER/$(echo $KUBE_SERVER_AWS | sed 's/\//\\\//g')/g" $KUBECONFIG
+sed -i "s/_AWS_SERVER/$(echo "$KUBE_SERVER_AWS" | sed 's/\//\\\//g')/g" $KUBECONFIG
 sed -i "s/_AWS_CA_DATA/$KUBE_CA_AWS/g" $KUBECONFIG
 
 for KUBERNETES_YAML in `find "./$KUBE_YAML_FOLDER/" -name '*.yaml'` ;
 do
-  sed -i 's/{{IMAGE_TAG}}/'"$GITHUB_TAG"'/g' $KUBERNETES_YAML
-  kubectl --insecure-skip-tls-verify apply -n $KUBE_NAMESPACE_AWS -f $KUBERNETES_YAML
+  sed -i 's/{{IMAGE_TAG}}/'"$GITHUB_TAG"'/g' "$KUBERNETES_YAML"
+  kubectl --insecure-skip-tls-verify apply -n "$KUBE_NAMESPACE_AWS" -f "$KUBERNETES_YAML"
 done
 
 IFS=',' read -r -a DEPLOYMENTS <<< "$KUBE_DEPLOYMENTS_AWS"
 
 for deployment in "${DEPLOYMENTS[@]}"; do
-  kubectl --insecure-skip-tls-verify rollout status -n $KUBE_NAMESPACE_AWS $deployment
+  kubectl --insecure-skip-tls-verify rollout status -n "$KUBE_NAMESPACE_AWS" $deployment
 done

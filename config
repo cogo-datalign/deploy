@@ -8,7 +8,7 @@ contexts:
 - context:
     cluster: eks
     user: eks
-    namespace: leadalign
+    namespace: _KUBE_NAMESPACE_AWS
   name: eks
 current-context: eks
 kind: Config
