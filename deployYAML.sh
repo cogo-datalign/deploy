@@ -9,6 +9,13 @@ if [[ "$GITHUB_REF" != *"tags"* && "$GITHUB_REF" != "refs/heads/master" ]]; then
   exit 0
 fi
 
+# only deploy versioned tags or master
+if [[ "$GITHUB_REF" == *"tags"* && "$GITHUB_REF" != "refs/tags/v"*"."*"."* && "$GITHUB_REF" != "refs/tags/sales-v"*"."*"."* ]]; then
+  echo "Non-versioned tag used."
+  echo "Doing nothing."
+  exit 0
+fi
+
 GITHUB_TAG=$(echo "$GITHUB_REF" | sed 's/refs\/tags\///g' | sed 's/refs\/heads\///g')
 
 # Wait for the tag to build in docker.cogolo.net
