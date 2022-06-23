@@ -3,17 +3,21 @@
 # Github Actions default environment variables
 # https://docs.github.com/en/enterprise-server@3.2/actions/learn-github-actions/environment-variables#default-environment-variables
 
-if [[ "$GITHUB_REF" != *"tags"* && "$GITHUB_REF" != "refs/heads/master" ]]; then
-  echo "No tags were specified."
-  echo "Doing nothing."
-  exit 0
-fi
+if [[ "$KUBE_DEPLOYMENTS_AWS" == "end-to-end-testing" ]]; then
+  echo "End-to-end testing - skipping tag verification."
+else
+  if [[ "$GITHUB_REF" != *"tags"* && "$GITHUB_REF" != "refs/heads/master" ]]; then
+    echo "No tags were specified."
+    echo "Doing nothing."
+    exit 0
+  fi
 
-# only deploy versioned tags or master
-if [[ "$GITHUB_REF" == *"tags"* && "$GITHUB_REF" != "refs/tags/v"*"."*"."* && "$GITHUB_REF" != "refs/tags/sales-v"*"."*"."* ]]; then
-  echo "Non-versioned tag used."
-  echo "Doing nothing."
-  exit 0
+  # only deploy versioned tags or master
+  if [[ "$GITHUB_REF" == *"tags"* && "$GITHUB_REF" != "refs/tags/v"*"."*"."* && "$GITHUB_REF" != "refs/tags/sales-v"*"."*"."* ]]; then
+    echo "Non-versioned tag used."
+    echo "Doing nothing."
+    exit 0
+  fi
 fi
 
 GITHUB_TAG=$(echo "$GITHUB_REF" | sed 's/refs\/tags\///g' | sed 's/refs\/heads\///g')
