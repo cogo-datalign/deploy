@@ -60,7 +60,7 @@ sed -i "s/_AWS_SERVER/$(echo "$KUBE_SERVER_AWS" | sed 's/\//\\\//g')/g" $KUBECON
 sed -i "s/_AWS_CA_DATA/$KUBE_CA_AWS/g" $KUBECONFIG
 
 if [[ "$KUBE_DEPLOYMENTS_AWS" == "end-to-end-testing" ]]; then
-  export KUBERNETES_YAML = "./$KUBE_YAML_FOLDER/end-to-end-testing.yaml"
+  export KUBERNETES_YAML="./$KUBE_YAML_FOLDER/end-to-end-testing.yaml"
 
   sed -i 's/{{IMAGE_TAG}}/'"$GITHUB_TAG"'/g' "$KUBERNETES_YAML"
   kubectl --insecure-skip-tls-verify apply -n "$KUBE_NAMESPACE_AWS" -f "$KUBERNETES_YAML"
