@@ -3,17 +3,21 @@
 # Github Actions default environment variables
 # https://docs.github.com/en/enterprise-server@3.2/actions/learn-github-actions/environment-variables#default-environment-variables
 
-if [[ "$GITHUB_REF" != *"tags"* && "$GITHUB_REF" != "refs/heads/master" ]]; then
-  echo "No tags were specified."
-  echo "Doing nothing."
-  exit 0
-fi
+if [[ "$KUBE_DEPLOYMENTS_AWS" == "end-to-end-testing" ]]; then
+  echo "End-to-end testing - skipping tag verification."
+else
+  if [[ "$GITHUB_REF" != *"tags"* && "$GITHUB_REF" != "refs/heads/master" ]]; then
+    echo "No tags were specified."
+    echo "Doing nothing."
+    exit 0
+  fi
 
-# only deploy versioned tags or master
-if [[ "$GITHUB_REF" == *"tags"* && "$GITHUB_REF" != "refs/tags/v"*"."*"."* && "$GITHUB_REF" != "refs/tags/sales-v"*"."*"."* ]]; then
-  echo "Non-versioned tag used."
-  echo "Doing nothing."
-  exit 0
+  # only deploy versioned tags or master
+  if [[ "$GITHUB_REF" == *"tags"* && "$GITHUB_REF" != "refs/tags/v"*"."*"."* && "$GITHUB_REF" != "refs/tags/sales-v"*"."*"."* ]]; then
+    echo "Non-versioned tag used."
+    echo "Doing nothing."
+    exit 0
+  fi
 fi
 
 GITHUB_TAG=$(echo "$GITHUB_REF" | sed 's/refs\/tags\///g' | sed 's/refs\/heads\///g')
@@ -55,14 +59,22 @@ sed -i "s/_AWS_SECRET_ACCESS_KEY/$(echo "$AWS_SECRET_ACCESS_KEY" | sed 's/\//\\\
 sed -i "s/_AWS_SERVER/$(echo "$KUBE_SERVER_AWS" | sed 's/\//\\\//g')/g" $KUBECONFIG
 sed -i "s/_AWS_CA_DATA/$KUBE_CA_AWS/g" $KUBECONFIG
 
-for KUBERNETES_YAML in `find "./$KUBE_YAML_FOLDER/" -name '*.yaml'` ;
-do
+if [[ "$KUBE_DEPLOYMENTS_AWS" == "end-to-end-testing" ]]; then
+  export KUBERNETES_YAML = "./$KUBE_YAML_FOLDER/end-to-end-testing.yaml"
+
   sed -i 's/{{IMAGE_TAG}}/'"$GITHUB_TAG"'/g' "$KUBERNETES_YAML"
   kubectl --insecure-skip-tls-verify apply -n "$KUBE_NAMESPACE_AWS" -f "$KUBERNETES_YAML"
-done
+else
+  for KUBERNETES_YAML in `find "./$KUBE_YAML_FOLDER/" -name '*.yaml'` ;
+  do
+    sed -i 's/{{IMAGE_TAG}}/'"$GITHUB_TAG"'/g' "$KUBERNETES_YAML"
+    kubectl --insecure-skip-tls-verify apply -n "$KUBE_NAMESPACE_AWS" -f "$KUBERNETES_YAML"
+  done
 
-IFS=',' read -r -a DEPLOYMENTS <<< "$KUBE_DEPLOYMENTS_AWS"
+  IFS=',' read -r -a DEPLOYMENTS <<< "$KUBE_DEPLOYMENTS_AWS"
 
-for deployment in "${DEPLOYMENTS[@]}"; do
-  kubectl --insecure-skip-tls-verify rollout status -n "$KUBE_NAMESPACE_AWS" $deployment
-done
+  for deployment in "${DEPLOYMENTS[@]}"; do
+    kubectl --insecure-skip-tls-verify rollout status -n "$KUBE_NAMESPACE_AWS" $deployment
+  done
+fi
+
