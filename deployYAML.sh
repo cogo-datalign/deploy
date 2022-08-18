@@ -22,21 +22,24 @@ fi
 
 GITHUB_TAG=$(echo "$GITHUB_REF" | sed 's/refs\/tags\///g' | sed 's/refs\/heads\///g')
 
-# Wait for the tag to build in docker.cogolo.net
-for i in $(seq 1 300); do
-  curl --output /dev/null --cipher 'DEFAULT:!DH' --silent --head --fail "https://docker.cogolo.net/api/v1/repository/$DOCKER_ORG/$DOCKER_REPO/tag/$GITHUB_TAG/images" -H "Authorization: Bearer $OAUTH_TOKEN" && {
-    DONE="true"
-    break
-  } || {
-    echo "Waiting for tag '$GITHUB_TAG' to build in docker.cogolo.net..."
-    sleep 5
-  }
-done
+REQUIRE_BUILD_WAIT=False # not necessary if building image in a previous step
+if [ $REQUIRE_BUILD_WAIT = True ] ; then
+  # Wait for the tag to build in docker.cogolo.net
+  for i in $(seq 1 300); do
+    curl --output /dev/null --cipher 'DEFAULT:!DH' --silent --head --fail "https://docker.cogolo.net/api/v1/repository/$DOCKER_ORG/$DOCKER_REPO/tag/$GITHUB_TAG/images" -H "Authorization: Bearer $OAUTH_TOKEN" && {
+      DONE="true"
+      break
+    } || {
+      echo "Waiting for tag '$GITHUB_TAG' to build in docker.cogolo.net..."
+      sleep 5
+    }
+  done
 
-if [ -z "$DONE" ]; then
-  echo "Timeout waiting on '$GITHUB_TAG' to build in docker.cogolo.net."
-  echo "Exiting."
-  exit 1
+  if [ -z "$DONE" ]; then
+    echo "Timeout waiting on '$GITHUB_TAG' to build in docker.cogolo.net."
+    echo "Exiting."
+    exit 1
+  fi
 fi
  
 # Ensure that we use a local kubeconfig file
