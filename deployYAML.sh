@@ -46,7 +46,7 @@ fi
 export KUBECONFIG="./kube_config"
 
 # Create the Kube config and set the token 
-curl --silent https://raw.git.cogolo.net/clickx/deploy/master/config >> $KUBECONFIG
+curl --silent https://raw.github.com/cogo-datalign/deploy/master/config >> $KUBECONFIG
 
 #
 # Deploy to AWS
@@ -61,6 +61,8 @@ sed -i "s/_AWS_SECRET_ACCESS_KEY/$(echo "$AWS_SECRET_ACCESS_KEY" | sed 's/\//\\\
 # set kubes server and CA data
 sed -i "s/_AWS_SERVER/$(echo "$KUBE_SERVER_AWS" | sed 's/\//\\\//g')/g" $KUBECONFIG
 sed -i "s/_AWS_CA_DATA/$KUBE_CA_AWS/g" $KUBECONFIG
+
+cat $KUBECONFIG
 
 if [[ "$KUBE_DEPLOYMENTS_AWS" == "end-to-end-testing" ]]; then
   export KUBERNETES_YAML="./$KUBE_YAML_FOLDER/end-to-end-testing.yaml"
