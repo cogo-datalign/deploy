@@ -21,7 +21,7 @@ else
 fi
 
 # if building master, restart pods
-if [[ "$GITHUB_REF" == "refs/heads/master" ]]; then
+if [[ "$GITHUB_REF" == "refs/heads/jelbahrawy-938-system-story-automatic-deploys-to-staging-not-always-working" ]]; then
   IFS=',' read -r -a DEPLOYMENTS <<< "$KUBE_DEPLOYMENTS_AWS"
 
   for deployment in "${DEPLOYMENTS[@]}"; do
