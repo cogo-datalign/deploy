@@ -20,6 +20,16 @@ else
   fi
 fi
 
+# if building master, restart pods
+if [[ "$GITHUB_REF" == "refs/heads/master" ]]; then
+  IFS=',' read -r -a DEPLOYMENTS <<< "$KUBE_DEPLOYMENTS_AWS"
+
+  for deployment in "${DEPLOYMENTS[@]}"; do
+    kubectl --insecure-skip-tls-verify rollout restart deployment $deployment -n "leadalign-staging"
+  done
+  exit 0
+fi
+
 GITHUB_TAG=$(echo "$GITHUB_REF" | sed 's/refs\/tags\///g' | sed 's/refs\/heads\///g')
 
 REQUIRE_BUILD_WAIT=False # not necessary if building image in a previous step
