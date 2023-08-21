@@ -12,6 +12,16 @@ else
     exit 0
   fi
 
+  # if building master, restart pods
+  if [[ "$GITHUB_REF" == "refs/heads/master" ]]; then
+    IFS=',' read -r -a DEPLOYMENTS <<< "$KUBE_DEPLOYMENTS_AWS"
+
+    for deployment in "${DEPLOYMENTS[@]}"; do
+      kubectl --insecure-skip-tls-verify rollout restart deployment $deployment -n "leadalign-staging"
+    done
+    exit 0
+  fi
+
   # only deploy versioned tags or master
   if [[ "$GITHUB_REF" == *"tags"* && "$GITHUB_REF" != "refs/tags/v"*"."*"."* && "$GITHUB_REF" != "refs/tags/sales-v"*"."*"."* ]]; then
     echo "Non-versioned tag used."
