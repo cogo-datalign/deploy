@@ -14,11 +14,7 @@ else
 
   # if building master, restart pods
   if [[ "$GITHUB_REF" == "refs/heads/master" ]]; then
-    IFS=',' read -r -a DEPLOYMENTS <<< "$KUBE_DEPLOYMENTS_AWS"
-
-    for deployment in "${DEPLOYMENTS[@]}"; do
-      kubectl --insecure-skip-tls-verify rollout restart deployment $deployment -n "leadalign-staging"
-    done
+    kubectl --insecure-skip-tls-verify delete --all deployments --namespace=leadalign-staging
     exit 0
   fi
 
