@@ -14,7 +14,7 @@ else
 
   # if building master, restart pods
   if [[ "$GITHUB_REF" == "refs/heads/master" ]]; then
-    kubectl --insecure-skip-tls-verify delete --all deployments --namespace=leadalign-staging
+    kubectl --insecure-skip-tls-verify delete --all pods --namespace=leadalign-staging
     exit 0
   fi
 
