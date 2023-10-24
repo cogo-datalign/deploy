@@ -32,3 +32,4 @@ users:
             value: "_AWS_ACCESS_KEY_ID"
           - name: AWS_SECRET_ACCESS_KEY
             value: "_AWS_SECRET_ACCESS_KEY"
+        interactiveMode: Never
