@@ -19,7 +19,7 @@ else
   fi
 
   # only deploy versioned tags or master
-  if [[ "$GITHUB_REF" == *"tags"* && "$GITHUB_REF" != "refs/tags/v"*"."*"."* && "$GITHUB_REF" != "refs/tags/sales-v"*"."*"."* ]]; then
+  if [[ "$GITHUB_REF" == *"tags"* && "$GITHUB_REF" != "refs/tags/v"*"."*"."* && "$GITHUB_REF" != "refs/tags/sales-"* ]]; then
     echo "Non-versioned tag used."
     echo "Doing nothing."
     exit 0
