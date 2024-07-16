@@ -6,6 +6,8 @@ module "eks" {
   source         = "terraform-aws-modules/eks/aws"
   cluster_name   = "Test-Green-Cluster-ten"
   cluster_version = "1.28"
+  cluster_endpoint_public_access = true
+  cluster_endpoint_private_access = true
 
   vpc_id = "vpc-0fe2c01a1360765e3"
   subnet_ids = ["subnet-07016ef218378d92f", "subnet-0f6c2f95e7ba90911", "subnet-074cf248e712ccbb5", "subnet-03eeb45e200a89454"]  # Specify your VPC subnets
