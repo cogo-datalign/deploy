@@ -1,3 +1,11 @@
+terraform {
+  required_providers {
+    utils = {
+      source = "cloudposse/utils"
+    }
+  }
+}
+
 provider "aws" {
   region = "us-east-1"
 }
@@ -86,3 +94,9 @@ resource "aws_eks_access_policy_association" "eleven-e" {
     type = "cluster"
   }
 }
+
+data "utils_aws_eks_update_kubeconfig" "eleven" {
+  cluster_name = "Test-Green-Cluster-eleven"
+  profile = "default"
+}
+
