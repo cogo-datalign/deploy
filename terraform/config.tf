@@ -45,3 +45,44 @@ resource "aws_eks_access_entry" "eleven" {
   type="STANDARD"
 }
 
+resource "aws_eks_access_policy_association" "eleven-a" {
+  cluster_name = "Test-Green-Cluster-eleven"
+  principal_arn = "arn:aws:iam::877258856486:user/leadalign-eks-master"
+  policy_arn = "arn:aws:eks::aws:cluster-access-policy/AmazonEKSAdminPolicy"
+  access_scope {
+    type = "cluster"
+  }
+}
+
+resource "aws_eks_access_policy_association" "eleven-b" {
+  cluster_name = "Test-Green-Cluster-eleven"
+  principal_arn = "arn:aws:iam::877258856486:user/leadalign-eks-master"
+  policy_arn = "arn:aws:eks::aws:cluster-access-policy/AmazonEKSAdminViewPolicy"
+  access_scope {
+    type = "cluster"
+  }
+}
+resource "aws_eks_access_policy_association" "eleven-c" {
+  cluster_name = "Test-Green-Cluster-eleven"
+  principal_arn = "arn:aws:iam::877258856486:user/leadalign-eks-master"
+  policy_arn = "arn:aws:eks::aws:cluster-access-policy/AmazonEKSClusterAdminPolicy"
+  access_scope {
+    type = "cluster"
+  }
+}
+resource "aws_eks_access_policy_association" "eleven-d" {
+  cluster_name = "Test-Green-Cluster-eleven"
+  principal_arn = "arn:aws:iam::877258856486:user/leadalign-eks-master"
+  policy_arn = "arn:aws:eks::aws:cluster-access-policy/AmazonEKSEditPolicy"
+  access_scope {
+    type = "cluster"
+  }
+}
+resource "aws_eks_access_policy_association" "eleven-e" {
+  cluster_name = "Test-Green-Cluster-eleven"
+  principal_arn = "arn:aws:iam::877258856486:user/leadalign-eks-master"
+  policy_arn = "arn:aws:eks::aws:cluster-access-policy/AmazonEKSViewPolicy"
+  access_scope {
+    type = "cluster"
+  }
+}
