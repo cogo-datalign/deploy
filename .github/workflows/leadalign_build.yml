@@ -19,7 +19,7 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
-      
+
       - name: Set curated reference
         run: |
           CURATED_REF=datalignadvisory/leadalign:$(echo "$GITHUB_REF" | sed 's/refs\/tags\///g' | sed 's/refs\/heads\///g')
@@ -38,7 +38,7 @@ jobs:
         uses: docker/build-push-action@v6
         with:
           context: ./leadalign-build
-          file: Dockerfile
+          file: ./leadalign-build/Dockerfile
           buildkit: true
           provenance: mode=max
           sbom: true
