@@ -1,0 +1,24 @@
+FROM ubuntu:22.04
+ENV GO_VERSION=1.23.2
+ENV DEBIAN_FRONTEND=noninteractive
+RUN apt update --allow-unauthenticated --allow-insecure-repositories -y && \
+    mkdir -p /bin && apt -y upgrade && apt -y install wget git && \
+    apt -y update && apt -y upgrade && \
+    apt install software-properties-common -y && \
+    add-apt-repository ppa:deadsnakes/ppa -y && \
+    apt -y update && \
+    apt -y upgrade && \
+    apt install -qq -y build-essential mariadb-client python3.12 python3.12-dev && \
+    apt autoclean -y && apt autoremove -y --purge && apt clean 
+RUN wget https://go.dev/dl/go${GO_VERSION}.linux-amd64.tar.gz && tar -C /usr/local -xzvf go${GO_VERSION}.linux-amd64.tar.gz > /dev/null 2>&1
+
+ENV PATH="/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/local/go/bin:/go/bin"
+ENV CGO_ENABLED=1
+ENV GOPRIVATE=github.com/cogo-datalign
+ENV GOBIN=/go/bin
+ENV GODEBUG=netdns=cgo
+ENV TZ=America/New_York
+
+WORKDIR /go/src/github.com/cogo-datalign/leadalign
+RUN git config --global url."git@github.com:".insteadOf "https://github.com/"
+
