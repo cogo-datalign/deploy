@@ -2,7 +2,7 @@ name: "leadalign-build container CI/CD builder"
 
 on:
   push:
-    branches: ["*"]
+    branches: ["*-build"]
     tags:
       - "build-v*"
       - "build-latest"
