@@ -21,5 +21,4 @@ ENV GODEBUG=netdns=cgo
 ENV TZ=America/New_York
 
 WORKDIR /go/src/github.com/cogo-datalign/leadalign
-RUN git config --global url."git@github.com:".insteadOf "https://github.com/"
 
