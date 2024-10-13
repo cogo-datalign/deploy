@@ -22,7 +22,7 @@ jobs:
 
       - name: Set curated reference
         run: |
-          CURATED_REF=datalignadvisory/leadalign:$(echo "$GITHUB_REF" | sed 's/refs\/tags\///g' | sed 's/refs\/heads\///g')
+          CURATED_REF=datalignadvisory/leadalign-build:$(echo "$GITHUB_REF" | sed 's/refs\/tags\///g' | sed 's/refs\/heads\///g')
           echo  curated_ref="$CURATED_REF" >> $GITHUB_ENV
 
       - name: Login to Docker Hub
