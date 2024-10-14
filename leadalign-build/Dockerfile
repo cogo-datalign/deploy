@@ -1,4 +1,5 @@
 FROM ubuntu:22.04
+
 ENV DEBIAN_FRONTEND=noninteractive
 RUN apt update --allow-unauthenticated --allow-insecure-repositories -y && \
     mkdir -p /bin && apt -y upgrade && apt -y install wget git && \
@@ -21,4 +22,5 @@ ENV GODEBUG=netdns=cgo
 ENV TZ=America/New_York
 
 WORKDIR /go/src/github.com/cogo-datalign/leadalign
-
+ARG SERVICE_PAT
+RUN git config --global url."https://leadalign-service-account:${SERVICE_PAT}"
