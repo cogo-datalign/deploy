@@ -23,7 +23,7 @@ ENV TZ=America/New_York
 
 WORKDIR /go/src/github.com/cogo-datalign/leadalign
 
-RUN mkdir -p /home/docker
+RUN mkdir -p /home/docker && chmod 777 /home/docker
 ENV HOME=/home/docker
 ARG SERVICE_PAT
 RUN git config --global url."https://leadalign-service-account:${SERVICE_PAT}@github.com".insteadOf "https://github.com"
