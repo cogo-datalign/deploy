@@ -23,4 +23,4 @@ ENV TZ=America/New_York
 
 WORKDIR /go/src/github.com/cogo-datalign/leadalign
 ARG SERVICE_PAT
-RUN git config --global url."https://leadalign-service-account:${SERVICE_PAT}"
+RUN git config --global url."https://leadalign-service-account:${SERVICE_PAT}@github.com".insteadOf "https://github.com"
