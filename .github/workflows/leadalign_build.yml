@@ -1,0 +1,49 @@
+name: "leadalign-build container CI/CD builder"
+
+on:
+  push:
+    branches: ["*-build"]
+    tags:
+      - "build-v*"
+      - "build-latest"
+
+# this is to prevent separate commits pushed to the same branch from triggering multiple workflow runs
+# so that we don't have multiple workflow runs queued up exhausting resources on the Github Actions worker
+concurrency: 
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    runs-on: [self-hosted]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set curated reference
+        run: |
+          CURATED_REF=datalignadvisory/leadalign-build:$(echo "$GITHUB_REF" | sed 's/refs\/tags\///g' | sed 's/refs\/heads\///g')
+          echo  curated_ref="$CURATED_REF" >> $GITHUB_ENV
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKER_HUB_USERNAME }}
+          password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build leadalign buider in Docker Hub
+        uses: docker/build-push-action@v6
+        with:
+          context: ./leadalign-build
+          file: ./leadalign-build/Dockerfile
+          buildkit: true
+          provenance: mode=max
+          sbom: true
+          push: true
+          tags: ${{ env.curated_ref }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max      
+          github-token: ${{ secrets.SERVICE_ACCOUNT_REPO_PAT }}                        
