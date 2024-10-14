@@ -22,5 +22,8 @@ ENV GODEBUG=netdns=cgo
 ENV TZ=America/New_York
 
 WORKDIR /go/src/github.com/cogo-datalign/leadalign
+
+RUN mkdir -p /home/docker
+ENV HOME=/home/docker
 ARG SERVICE_PAT
 RUN git config --global url."https://leadalign-service-account:${SERVICE_PAT}@github.com".insteadOf "https://github.com"
