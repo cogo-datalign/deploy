@@ -15,11 +15,6 @@ ENV GO_VERSION=1.23.2
 RUN wget -q https://go.dev/dl/go${GO_VERSION}.linux-amd64.tar.gz > /dev/null && tar -C /usr/local -xzvf go${GO_VERSION}.linux-amd64.tar.gz > /dev/null 2>&1 && rm -f go${GO_VERSION}.linux-amd64.tar.gz
 
 ENV PATH="/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/local/go/bin:/go/bin"
-ENV CGO_ENABLED=1
-ENV GOPRIVATE=github.com/cogo-datalign
-ENV GOBIN=/go/bin
-ENV GODEBUG=netdns=cgo
-ENV TZ=America/New_York
 
 WORKDIR /go/src/github.com/cogo-datalign/leadalign
 
