@@ -40,7 +40,6 @@ jobs:
           context: ./leadalign-build
           file: ./leadalign-build/Dockerfile
           buildkit: true
-          build-args: SERVICE_PAT=${{ secrets.SERVICE_ACCOUNT_REPO_PAT }}
           provenance: mode=max
           sbom: true
           push: true
